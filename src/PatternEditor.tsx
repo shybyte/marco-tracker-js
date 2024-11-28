@@ -44,7 +44,7 @@ interface NoteRowProps {
   pos: number;
   notes: Note[];
   step: PatternStep;
-  setNote: (note: Note) => void;
+  setNote: (note: Note | undefined) => void;
 }
 
 function NoteRow(props: NoteRowProps) {
@@ -57,7 +57,7 @@ function NoteRow(props: NoteRowProps) {
           <td
             // class={cssClasses.noteCell}
             classList={{ [cssClasses.noteCell]: true, [cssClasses.noteSelected]: props.step.note === note }}
-            onClick={() => props.setNote(note)}
+            onClick={() => props.setNote(props.step.note !== note ? note : undefined)}
           >
             {note}
           </td>
