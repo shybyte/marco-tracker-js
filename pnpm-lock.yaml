@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      smplr:
+        specifier: ^0.15.1
+        version: 0.15.1
       solid-js:
         specifier: ^1.8.11
         version: 1.8.11
@@ -677,6 +680,10 @@ packages:
   seroval@1.0.4:
     resolution: {integrity: sha512-qQs/N+KfJu83rmszFQaTxcoJoPn6KNUruX4KmnmyD0oZkUoiNvJ1rpdYKDf4YHM05k+HOgCxa3yvf15QbVijGg==}
     engines: {node: '>=10'}
+
+  smplr@0.15.1:
+    resolution: {integrity: sha512-V2ZqDE2R9dEhvv6e8iMwf0mGebfrxCu00L9CllfdcWadV+soDlW/81dnlRYkD7ZJlMjetDSlhJHMdDDLeqKHRg==}
+    engines: {node: '>=14.0.0'}
 
   solid-devtools@0.29.2:
     resolution: {integrity: sha512-sfGLBSIQ3E5dFha5UCE5wKnz+War99JNAOggfBbwhltXL8lbIG1PnKKB9N2pvloZuFzMtT/u1Qbb/ubqXnw2Sg==}
@@ -1408,6 +1415,8 @@ snapshots:
 
   seroval@1.0.4: {}
 
+  smplr@0.15.1: {}
+
   solid-devtools@0.29.2(solid-js@1.8.11)(vite@5.0.11):
     dependencies:
       '@babel/core': 7.23.7
@@ -1416,6 +1425,7 @@ snapshots:
       '@solid-devtools/debugger': 0.23.3(solid-js@1.8.11)
       '@solid-devtools/shared': 0.13.1(solid-js@1.8.11)
       solid-js: 1.8.11
+    optionalDependencies:
       vite: 5.0.11
     transitivePeerDependencies:
       - supports-color
@@ -1474,7 +1484,7 @@ snapshots:
       fsevents: 2.3.3
 
   vitefu@0.2.5(vite@5.0.11):
-    dependencies:
+    optionalDependencies:
       vite: 5.0.11
 
   yallist@3.1.1: {}

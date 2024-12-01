@@ -1,9 +1,11 @@
+import { Soundfont } from 'smplr';
+import { For } from 'solid-js';
 import { createStore, produce } from 'solid-js/store';
 import cssClasses from './PatternEditor.module.css';
-import { Note, Pattern, PatternStep } from './song';
-import { For } from 'solid-js';
 import { C3, C4 } from './notes';
+import { Note, Pattern, PatternStep } from './song';
 import { range, times } from './utils';
+import { playNote } from './instruments';
 
 function createEmptyPattern(length: number): Pattern {
   return { steps: times(length, () => ({ note: undefined })) };
@@ -24,13 +26,16 @@ export function PatternEditor() {
                 pos={i()}
                 notes={notes}
                 step={step}
-                setNote={(note) =>
-                  setPattern(
+                setNote={(note) => {
+                  if (note) {
+                    playNote(note);
+                  }
+                  return setPattern(
                     produce((pattern) => {
                       pattern.steps[i()].note = note;
                     }),
-                  )
-                }
+                  );
+                }}
               />
             )}
           </For>
@@ -48,7 +53,6 @@ interface NoteRowProps {
 }
 
 function NoteRow(props: NoteRowProps) {
-  console.log(props);
   return (
     <tr>
       <td>{props.pos}</td>

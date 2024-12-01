@@ -1,12 +1,14 @@
 {
   "name": "vite-template-solid",
   "version": "0.0.0",
+  "type": "module",
   "description": "",
   "scripts": {
     "start": "vite",
     "dev": "vite",
     "build": "vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "download-instruments": "node tools/download-instruments.js"
   },
   "license": "MIT",
   "devDependencies": {
@@ -16,6 +18,7 @@
     "vite-plugin-solid": "^2.8.2"
   },
   "dependencies": {
+    "smplr": "^0.15.1",
     "solid-js": "^1.8.11"
   }
 }
