@@ -1,4 +1,4 @@
-import { For } from 'solid-js';
+import { For, createEffect } from 'solid-js';
 import { createStore, produce } from 'solid-js/store';
 import cssClasses from './PatternEditor.module.css';
 import { playNote } from './instruments';
@@ -42,15 +42,14 @@ import {
 import { Note, Pattern, PatternStep } from './song';
 import { focusElement, range, times } from './utils';
 
-function createEmptyPattern(length: number): Pattern {
-  return { steps: times(length, () => ({ note: undefined })) };
-}
-
 const notes = range(C3, C4);
 
-export function PatternEditor() {
+interface PatternEditorProps {
+  patternMut: Pattern;
+}
+
+export function PatternEditor(props: PatternEditorProps) {
   const baseNote = C3;
-  const [pattern, setPattern] = createStore<Pattern>(createEmptyPattern(16));
 
   function onKeyDown(event: KeyboardEvent) {
     const inputNote = NOTE_BY_KEY_CODE[event.code];
@@ -65,7 +64,7 @@ export function PatternEditor() {
     <div ref={focusElement} class={cssClasses.patternEditor} tabIndex={0} onKeyDown={onKeyDown}>
       <table>
         <tbody>
-          <For each={pattern.steps}>
+          <For each={props.patternMut.steps}>
             {(step, i) => (
               <NoteRow
                 pos={i()}
@@ -75,11 +74,7 @@ export function PatternEditor() {
                   if (note) {
                     playNote(note);
                   }
-                  return setPattern(
-                    produce((pattern) => {
-                      pattern.steps[i()].note = note;
-                    }),
-                  );
+                  props.patternMut.steps[i()].note = note;
                 }}
               />
             )}
@@ -104,7 +99,6 @@ function NoteRow(props: NoteRowProps) {
       <For each={props.notes}>
         {(note) => (
           <td
-            // class={cssClasses.noteCell}
             classList={{ [cssClasses.noteCell]: true, [cssClasses.noteSelected]: props.step.note === note }}
             onClick={() => props.setNote(props.step.note !== note ? note : undefined)}
           >

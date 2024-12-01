@@ -2,12 +2,12 @@ Doing:
 
 
 TODO:
-* Save Song (Pattern)
-* Load Song
 * Play pattern
 * Set octave
 
 Done:
+* Load Song
+* Save Song (Pattern)
 * Play instrument with computer keyboard
 * Play instrument offline
 * Play sound when note is clicked
