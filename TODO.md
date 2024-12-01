@@ -1,8 +1,8 @@
 Doing:
+* Play pattern
 
 
 TODO:
-* Play pattern
 * Set octave
 
 Done:
