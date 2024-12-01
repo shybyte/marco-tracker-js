@@ -1,3 +1,5 @@
+import { Note } from './song';
+
 export const C_1 = 0;
 export const Cis_1 = 1;
 export const D_1 = 2;
@@ -126,3 +128,10 @@ export const E9 = 124;
 export const F9 = 125;
 export const Fis9 = 126;
 export const G9 = 127;
+
+export function getMidiNoteName(midiNumber: Note): string {
+  const noteNames = ['C', 'Cis', 'D', 'Dis', 'E', 'F', 'Fis', 'G', 'Gis', 'A', 'B', 'H'];
+  const octave = Math.floor(midiNumber / 12) - 1;
+  const noteIndex = midiNumber % 12;
+  return noteNames[noteIndex] + octave;
+}

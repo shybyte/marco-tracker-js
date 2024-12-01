@@ -9,3 +9,9 @@ export function range(start: number, end: number): number[] {
 
   return times(end - start + 1, (i) => start + i);
 }
+
+export function focusElement(e: HTMLDivElement) {
+  setTimeout(function () {
+    e.focus();
+  });
+}

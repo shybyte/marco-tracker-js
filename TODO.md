@@ -2,8 +2,13 @@ Doing:
 
 
 TODO:
+* Save Song (Pattern)
+* Load Song
+* Play pattern
+* Set octave
 
 Done:
+* Play instrument with computer keyboard
 * Play instrument offline
 * Play sound when note is clicked
 * Prevent "The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page"
