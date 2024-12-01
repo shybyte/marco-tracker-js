@@ -14,6 +14,7 @@ const App: Component = () => {
     <div class={styles.App}>
       <header class={styles.header}>MarcoTracker</header>
       <main>
+        <button onClick={() => Object.assign(song, loadSong())}>Load</button>
         <button onClick={() => saveSong(song)}>Save</button>
         <PatternEditor patternMut={song.pattern[0]} />
       </main>
