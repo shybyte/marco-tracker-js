@@ -1,4 +1,4 @@
-import { For, createEffect } from 'solid-js';
+import { For, Index, createEffect, createMemo } from 'solid-js';
 import { createStore, produce } from 'solid-js/store';
 import cssClasses from './PatternEditor.module.css';
 import { playNote } from './instruments';
@@ -45,6 +45,7 @@ import { focusElement, range, times } from './utils';
 const notes = range(C3, C4);
 
 interface PatternEditorProps {
+  playPos: number;
   patternMut: Pattern;
 }
 
@@ -64,21 +65,22 @@ export function PatternEditor(props: PatternEditorProps) {
     <div ref={focusElement} class={cssClasses.patternEditor} tabIndex={0} onKeyDown={onKeyDown}>
       <table>
         <tbody>
-          <For each={props.patternMut.steps}>
+          <Index each={props.patternMut.steps}>
             {(step, i) => (
               <NoteRow
-                pos={i()}
+                pos={i}
                 notes={notes}
-                step={step}
+                step={step()}
+                isPlayPos={i === props.playPos}
                 setNote={(note) => {
                   if (note) {
                     playNote(note);
                   }
-                  props.patternMut.steps[i()].note = note;
+                  props.patternMut.steps[i].note = note;
                 }}
               />
             )}
-          </For>
+          </Index>
         </tbody>
       </table>
     </div>
@@ -90,22 +92,23 @@ interface NoteRowProps {
   notes: Note[];
   step: PatternStep;
   setNote: (note: Note | undefined) => void;
+  isPlayPos: boolean;
 }
 
 function NoteRow(props: NoteRowProps) {
   return (
-    <tr>
+    <tr classList={{ [cssClasses.playPos]: props.isPlayPos }}>
       <td>{props.pos}</td>
-      <For each={props.notes}>
+      <Index each={props.notes}>
         {(note) => (
           <td
-            classList={{ [cssClasses.noteCell]: true, [cssClasses.noteSelected]: props.step.note === note }}
-            onClick={() => props.setNote(props.step.note !== note ? note : undefined)}
+            classList={{ [cssClasses.noteCell]: true, [cssClasses.noteSelected]: props.step.note === note() }}
+            onClick={() => props.setNote(props.step.note !== note() ? note() : undefined)}
           >
-            {note}
+            {note()}
           </td>
         )}
-      </For>
+      </Index>
     </tr>
   );
 }

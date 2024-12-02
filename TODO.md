@@ -1,11 +1,13 @@
 Doing:
-* Play pattern
 
 
 TODO:
+* Set tempo
 * Set octave
 
 Done:
+* Visualize Playing Position
+* Play pattern
 * Load Song
 * Save Song (Pattern)
 * Play instrument with computer keyboard

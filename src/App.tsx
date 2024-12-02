@@ -1,30 +1,28 @@
-import type { Component } from 'solid-js';
-
+import { createSignal, type Component } from 'solid-js';
+import { createMutable } from 'solid-js/store';
 import styles from './App.module.css';
 import { PatternEditor } from './PatternEditor';
-import { createMutable, createStore, produce } from 'solid-js/store';
-import { Pattern, Song, createEmptyPattern, createEmptySong } from './song';
-import { F0 } from './notes';
-import { loadSong, saveSong } from './storage';
 import { playNote } from './instruments';
+import { Song, createEmptySong } from './song';
+import { loadSong, saveSong } from './storage';
 
 const App: Component = () => {
   const song = createMutable<Song>(loadSong() ?? createEmptySong());
-  let currentStep = 0;
+  let [playPos, setPlayPos] = createSignal(0);
 
   let timerId: number;
 
   function startPlay() {
     stopPlay();
-    currentStep = 0;
+    setPlayPos(0);
 
     timerId = setInterval(() => {
-      const step = song.pattern[0].steps[currentStep];
+      const step = song.pattern[0].steps[playPos()];
       if (step.note) {
         playNote(step.note);
       }
 
-      currentStep = (currentStep + 1) % song.pattern[0].steps.length;
+      setPlayPos((playPos() + 1) % song.pattern[0].steps.length);
     }, 200);
   }
 
@@ -40,7 +38,7 @@ const App: Component = () => {
         <button onClick={() => saveSong(song)}>Save</button>
         <button onClick={startPlay}>Play</button>
         <button onClick={stopPlay}>Stop</button>
-        <PatternEditor patternMut={song.pattern[0]} />
+        <PatternEditor patternMut={song.pattern[0]} playPos={playPos()} />
       </main>
     </div>
   );
