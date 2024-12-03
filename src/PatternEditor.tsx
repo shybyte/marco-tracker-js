@@ -47,6 +47,7 @@ const notes = range(C3, C4);
 interface PatternEditorProps {
   playPos: number;
   patternMut: Pattern;
+  stepsPerBeat: number;
 }
 
 export function PatternEditor(props: PatternEditorProps) {
@@ -72,6 +73,7 @@ export function PatternEditor(props: PatternEditorProps) {
                 notes={notes}
                 step={step()}
                 isPlayPos={i === props.playPos}
+                stepsPerBeat={props.stepsPerBeat}
                 setNote={(note) => {
                   if (note) {
                     playNote(note);
@@ -93,12 +95,19 @@ interface NoteRowProps {
   step: PatternStep;
   setNote: (note: Note | undefined) => void;
   isPlayPos: boolean;
+  stepsPerBeat: number;
 }
 
 function NoteRow(props: NoteRowProps) {
   return (
     <tr classList={{ [cssClasses.playPos]: props.isPlayPos }}>
-      <td>{props.pos}</td>
+      <td
+        classList={{
+          [cssClasses.beatStep]: props.pos % props.stepsPerBeat === 0,
+        }}
+      >
+        {props.pos}
+      </td>
       <Index each={props.notes}>
         {(note) => (
           <td

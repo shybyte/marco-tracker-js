@@ -6,6 +6,7 @@ TODO:
 * Set octave
 
 Done:
+* Mark beat length
 * Visualize Playing Position
 * Play pattern
 * Load Song

@@ -9,6 +9,7 @@ import { loadSong, saveSong } from './storage';
 const App: Component = () => {
   const song = createMutable<Song>(loadSong() ?? createEmptySong());
   let [playPos, setPlayPos] = createSignal(0);
+  const stepsPerBeat = 4;
 
   let timerId: number;
 
@@ -38,7 +39,7 @@ const App: Component = () => {
         <button onClick={() => saveSong(song)}>Save</button>
         <button onClick={startPlay}>Play</button>
         <button onClick={stopPlay}>Stop</button>
-        <PatternEditor patternMut={song.pattern[0]} playPos={playPos()} />
+        <PatternEditor patternMut={song.pattern[0]} playPos={playPos()} stepsPerBeat={stepsPerBeat} />
       </main>
     </div>
   );

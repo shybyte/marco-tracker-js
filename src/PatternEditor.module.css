@@ -17,6 +17,11 @@
   filter: brightness(1.2);
 }
 
+.beatStep {
+  color: #fff;
+  font-weight: bold;
+}
+
 .noteCell {
   background: #888;
   border-radius: 5px;
