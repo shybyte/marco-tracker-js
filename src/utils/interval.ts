@@ -10,6 +10,12 @@ export class AccurateInterval {
 
   start(): void {
     if (this.running) return;
+
+    if (!this.audioContext) {
+      this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    }
+
+    this.nextTime = this.audioContext.currentTime;
     this.running = true;
     this.tick();
   }
@@ -21,17 +27,13 @@ export class AccurateInterval {
   private tick = () => {
     if (!this.running) return;
 
-    if (!this.audioContext) {
-      this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-    }
-
-    const currentTime = this.audioContext.currentTime;
+    const currentTime = this.audioContext!.currentTime;
     if (currentTime >= this.nextTime) {
       this.callback();
       this.nextTime += this.intervalSeconds;
     }
 
-    // Use `setTimeout` or `requestAnimationFrame` to minimize load
+    // Use `setTimeout` or `requestAnimationFrame` ?
     setTimeout(this.tick, 1);
   };
 }
