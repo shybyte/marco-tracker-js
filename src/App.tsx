@@ -11,12 +11,11 @@ import { getStepTimeInSecondsForBmp } from './utils/utils';
 const App: Component = () => {
   const song = createMutable<Song>(loadSong() ?? createEmptySong());
   const [playPos, setPlayPos] = createSignal(0);
-  const [bpm, setBpm] = createSignal(120);
   const stepsPerBeat = 4;
 
   let timerId: number;
 
-  const interval = new AccurateInterval(getStepTimeInSecondsForBmp(bpm(), stepsPerBeat), () => {
+  const interval = new AccurateInterval(getStepTimeInSecondsForBmp(song.tempo, stepsPerBeat), () => {
     const step = song.pattern[0].steps[playPos()];
     if (step.note) {
       playNote(step.note);
@@ -26,7 +25,9 @@ const App: Component = () => {
   });
 
   createEffect(() => {
-    interval.intervalSeconds = getStepTimeInSecondsForBmp(bpm(), stepsPerBeat);
+    if (song.tempo > 20) {
+      interval.intervalSeconds = getStepTimeInSecondsForBmp(song.tempo, stepsPerBeat);
+    }
   });
 
   function startPlay() {
@@ -49,7 +50,17 @@ const App: Component = () => {
 
         <label>
           BPM:
-          <input type="number" placeholder="BPM" value={bpm()} onInput={(e) => setBpm(e.currentTarget.valueAsNumber)} />
+          <input
+            type="number"
+            class={styles.bpmInput}
+            placeholder="BPM"
+            value={song.tempo}
+            onInput={(e) => {
+              if (e.currentTarget.valueAsNumber) {
+                song.tempo = e.currentTarget.valueAsNumber;
+              }
+            }}
+          />
         </label>
         <PatternEditor patternMut={song.pattern[0]} playPos={playPos()} stepsPerBeat={stepsPerBeat} />
       </main>

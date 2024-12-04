@@ -2,6 +2,7 @@ import { F0 } from './notes';
 import { times } from './utils/utils';
 
 export interface Song {
+  tempo: number;
   pattern: Pattern[];
 }
 
@@ -17,6 +18,7 @@ export interface PatternStep {
 
 export function createEmptySong(): Song {
   return {
+    tempo: 120,
     pattern: [createEmptyPattern(16)],
   };
 }
