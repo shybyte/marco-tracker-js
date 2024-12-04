@@ -1,5 +1,5 @@
 import { F0 } from './notes';
-import { times } from './utils';
+import { times } from './utils/utils';
 
 export interface Song {
   pattern: Pattern[];

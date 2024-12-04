@@ -40,7 +40,7 @@ import {
   getMidiNoteName,
 } from './notes';
 import { Note, Pattern, PatternStep } from './song';
-import { focusElement, range, times } from './utils';
+import { focusElement, range, times } from './utils/utils';
 
 const notes = range(C3, C4);
 

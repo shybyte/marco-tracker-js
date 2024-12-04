@@ -2,10 +2,11 @@ Doing:
 
 
 TODO:
-* Set tempo
+* Store bpm with song
 * Set octave
 
 Done:
+* Set tempo in bpm
 * Mark beat length
 * Visualize Playing Position
 * Play pattern
