@@ -1,10 +1,14 @@
 Doing:
+* Set Pattern length
 
 
 TODO:
-* Set octave
+* Select Instrument per channel
+* Select Scale per channel
+* Set keyboard octave
 
 Done:
+* Set stepsPerBeat
 * Store bpm with song
 * Set tempo in BPM
 * Mark beat length

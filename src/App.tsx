@@ -11,11 +11,10 @@ import { getStepTimeInSecondsForBmp } from './utils/utils';
 const App: Component = () => {
   const song = createMutable<Song>(loadSong() ?? createEmptySong());
   const [playPos, setPlayPos] = createSignal(-1);
-  const stepsPerBeat = 4;
 
   let timerId: number;
 
-  const interval = new AccurateInterval(getStepTimeInSecondsForBmp(song.tempo, stepsPerBeat), () => {
+  const interval = new AccurateInterval(getStepTimeInSecondsForBmp(song.tempo, song.stepsPerBeat), () => {
     setPlayPos((playPos() + 1) % song.pattern[0].steps.length);
 
     const step = song.pattern[0].steps[playPos()];
@@ -26,7 +25,7 @@ const App: Component = () => {
 
   createEffect(() => {
     if (song.tempo >= 10) {
-      interval.intervalSeconds = getStepTimeInSecondsForBmp(song.tempo, stepsPerBeat);
+      interval.intervalSeconds = getStepTimeInSecondsForBmp(song.tempo, song.stepsPerBeat);
     }
   });
 
@@ -62,7 +61,22 @@ const App: Component = () => {
             }}
           />
         </label>
-        <PatternEditor patternMut={song.pattern[0]} playPos={playPos()} stepsPerBeat={stepsPerBeat} />
+
+        <label>
+          BeatSize:
+          <input
+            type="number"
+            class={styles.stepsPerBeatInput}
+            placeholder="BeatSize"
+            value={song.stepsPerBeat}
+            onInput={(e) => {
+              if (e.currentTarget.valueAsNumber) {
+                song.stepsPerBeat = e.currentTarget.valueAsNumber;
+              }
+            }}
+          />
+        </label>
+        <PatternEditor patternMut={song.pattern[0]} playPos={playPos()} stepsPerBeat={song.stepsPerBeat} />
       </main>
     </div>
   );

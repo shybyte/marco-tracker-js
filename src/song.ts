@@ -3,6 +3,7 @@ import { times } from './utils/utils';
 
 export interface Song {
   tempo: number;
+  stepsPerBeat: number;
   pattern: Pattern[];
 }
 
@@ -19,6 +20,7 @@ export interface PatternStep {
 export function createEmptySong(): Song {
   return {
     tempo: 120,
+    stepsPerBeat: 4,
     pattern: [createEmptyPattern(16)],
   };
 }
