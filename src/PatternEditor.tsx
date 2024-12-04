@@ -67,7 +67,7 @@ export function PatternEditor(props: PatternEditorProps) {
     <div ref={focusElement} class={cssClasses.patternEditor} tabIndex={0} onKeyDown={onKeyDown}>
       <table>
         <tbody>
-          <Index each={range(0, props.patternLength)}>
+          <Index each={range(0, props.patternLength - 1)}>
             {(_step, i) => (
               <NoteRow
                 pos={i}
