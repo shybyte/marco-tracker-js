@@ -10,28 +10,28 @@ import { getStepTimeInSecondsForBmp } from './utils/utils';
 
 const App: Component = () => {
   const song = createMutable<Song>(loadSong() ?? createEmptySong());
-  const [playPos, setPlayPos] = createSignal(0);
+  const [playPos, setPlayPos] = createSignal(-1);
   const stepsPerBeat = 4;
 
   let timerId: number;
 
   const interval = new AccurateInterval(getStepTimeInSecondsForBmp(song.tempo, stepsPerBeat), () => {
+    setPlayPos((playPos() + 1) % song.pattern[0].steps.length);
+
     const step = song.pattern[0].steps[playPos()];
     if (step.note) {
       playNote(step.note);
     }
-
-    setPlayPos((playPos() + 1) % song.pattern[0].steps.length);
   });
 
   createEffect(() => {
-    if (song.tempo > 20) {
+    if (song.tempo >= 10) {
       interval.intervalSeconds = getStepTimeInSecondsForBmp(song.tempo, stepsPerBeat);
     }
   });
 
   function startPlay() {
-    setPlayPos(0);
+    setPlayPos(-1);
     interval.start();
   }
 
