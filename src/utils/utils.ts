@@ -19,3 +19,9 @@ export function focusElement(e: HTMLDivElement) {
 export function getStepTimeInSecondsForBmp(bpm: number, stepsPerBeat: number) {
   return 60 / bpm / stepsPerBeat;
 }
+
+export function ensureArrayLength<T>(arrayMut: T[], length: number, fillElement: T) {
+  while (arrayMut.length < length) {
+    arrayMut.push(structuredClone(fillElement));
+  }
+}

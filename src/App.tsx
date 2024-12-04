@@ -1,7 +1,8 @@
-import { createSignal, type Component, createEffect } from 'solid-js';
+import { createEffect, createSignal, type Component } from 'solid-js';
 import { createMutable } from 'solid-js/store';
 import styles from './App.module.css';
 import { PatternEditor } from './PatternEditor';
+import { NumberInput } from './components/NumberInput';
 import { playNote } from './instruments';
 import { Song, createEmptySong } from './song';
 import { loadSong, saveSong } from './storage';
@@ -15,10 +16,10 @@ const App: Component = () => {
   let timerId: number;
 
   const interval = new AccurateInterval(getStepTimeInSecondsForBmp(song.tempo, song.stepsPerBeat), () => {
-    setPlayPos((playPos() + 1) % song.pattern[0].steps.length);
+    setPlayPos((playPos() + 1) % song.patternLength);
 
     const step = song.pattern[0].steps[playPos()];
-    if (step.note) {
+    if (step?.note) {
       playNote(step.note);
     }
   });
@@ -42,41 +43,35 @@ const App: Component = () => {
     <div class={styles.App}>
       <header class={styles.header}>MarcoTracker</header>
       <main>
-        <button onClick={() => Object.assign(song, loadSong())}>Load</button>
-        <button onClick={() => saveSong(song)}>Save</button>
-        <button onClick={startPlay}>Play</button>
-        <button onClick={stopPlay}>Stop</button>
+        <div role="toolbar">
+          <button onClick={() => Object.assign(song, loadSong())}>Load</button>
+          <button onClick={() => saveSong(song)}>Save</button>
+          <button onClick={startPlay}>Play</button>
+          <button onClick={stopPlay}>Stop</button>
 
-        <label>
-          BPM:
-          <input
-            type="number"
-            class={styles.bpmInput}
-            placeholder="BPM"
-            value={song.tempo}
-            onInput={(e) => {
-              if (e.currentTarget.valueAsNumber) {
-                song.tempo = e.currentTarget.valueAsNumber;
-              }
-            }}
-          />
-        </label>
+          <NumberInput value={song.tempo} label="BPM" width={3} setValue={(value) => (song.tempo = value)} />
 
-        <label>
-          BeatSize:
-          <input
-            type="number"
-            class={styles.stepsPerBeatInput}
-            placeholder="BeatSize"
+          <NumberInput
             value={song.stepsPerBeat}
-            onInput={(e) => {
-              if (e.currentTarget.valueAsNumber) {
-                song.stepsPerBeat = e.currentTarget.valueAsNumber;
-              }
-            }}
+            label="BeatSize"
+            width={2}
+            setValue={(value) => (song.stepsPerBeat = value)}
           />
-        </label>
-        <PatternEditor patternMut={song.pattern[0]} playPos={playPos()} stepsPerBeat={song.stepsPerBeat} />
+
+          <NumberInput
+            value={song.patternLength}
+            label="PatternLength"
+            width={3}
+            setValue={(value) => (song.patternLength = value)}
+          />
+        </div>
+
+        <PatternEditor
+          patternMut={song.pattern[0]}
+          playPos={playPos()}
+          stepsPerBeat={song.stepsPerBeat}
+          patternLength={song.patternLength}
+        />
       </main>
     </div>
   );

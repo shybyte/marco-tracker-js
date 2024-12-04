@@ -40,13 +40,14 @@ import {
   getMidiNoteName,
 } from './notes';
 import { Note, Pattern, PatternStep } from './song';
-import { focusElement, range, times } from './utils/utils';
+import { ensureArrayLength, focusElement, range, times } from './utils/utils';
 
 const notes = range(C3, C4);
 
 interface PatternEditorProps {
-  playPos: number;
   patternMut: Pattern;
+  patternLength: number;
+  playPos: number;
   stepsPerBeat: number;
 }
 
@@ -66,18 +67,20 @@ export function PatternEditor(props: PatternEditorProps) {
     <div ref={focusElement} class={cssClasses.patternEditor} tabIndex={0} onKeyDown={onKeyDown}>
       <table>
         <tbody>
-          <Index each={props.patternMut.steps}>
-            {(step, i) => (
+          <Index each={range(0, props.patternLength)}>
+            {(_step, i) => (
               <NoteRow
                 pos={i}
                 notes={notes}
-                step={step()}
+                step={props.patternMut.steps[i] ?? {}}
                 isPlayPos={i === props.playPos}
                 stepsPerBeat={props.stepsPerBeat}
                 setNote={(note) => {
                   if (note) {
                     playNote(note);
                   }
+
+                  ensureArrayLength(props.patternMut.steps, i + 1, {});
                   props.patternMut.steps[i].note = note;
                 }}
               />

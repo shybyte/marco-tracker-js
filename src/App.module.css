@@ -1,4 +1,9 @@
 .App {
+  div[role='toolbar'] {
+    display: flex;
+    gap: 5px;
+    margin: 10px;
+  }
 }
 
 .header {
@@ -10,12 +15,4 @@
   align-items: center;
   justify-content: center;
   color: white;
-}
-
-.bpmInput {
-  width: 3em;
-}
-
-.stepsPerBeatInput {
-  width: 2em;
 }
