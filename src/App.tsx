@@ -10,7 +10,7 @@ import { AccurateInterval } from './utils/interval';
 import { getStepTimeInSecondsForBmp } from './utils/utils';
 
 const App: Component = () => {
-  const song = createMutable<Song>(loadSong() ?? createEmptySong());
+  const song = createMutable<Song>({ ...createEmptySong(), ...loadSong() });
   const [playPos, setPlayPos] = createSignal(-1);
 
   let timerId: number;
@@ -20,7 +20,7 @@ const App: Component = () => {
 
     const step = song.pattern[0].steps[playPos()];
     if (step?.note) {
-      playNote(step.note);
+      playNote(song.instruments[0], step.note);
     }
   });
 
@@ -71,6 +71,7 @@ const App: Component = () => {
           playPos={playPos()}
           stepsPerBeat={song.stepsPerBeat}
           patternLength={song.patternLength}
+          instrument={song.instruments[0]}
         />
       </main>
     </div>

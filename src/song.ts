@@ -6,6 +6,7 @@ export interface Song {
   stepsPerBeat: number;
   patternLength: number;
   pattern: Pattern[];
+  instruments: string[];
 }
 
 export interface Pattern {
@@ -24,6 +25,7 @@ export function createEmptySong(): Song {
     tempo: 120,
     stepsPerBeat: 4,
     patternLength: patternLength,
+    instruments: ['marimba'],
     pattern: [createEmptyPattern(patternLength)],
   };
 }

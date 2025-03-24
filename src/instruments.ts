@@ -1,22 +1,53 @@
-import { Soundfont } from 'smplr';
+import { getSoundfontNames, Soundfont, SoundfontOptions } from 'smplr';
 import { Note } from './song';
-import { F0 } from './notes';
 
 let context: AudioContext;
 
+export const LOCAL_INSTRUMENTS = ['marimba'];
+
 class InstrumentPlayer {
-  private soundFont: Soundfont;
+  private soundFountByName = new Map<string, Soundfont>();
 
   constructor() {
-    this.soundFont = new Soundfont(context, {
-      instrumentUrl: 'http://localhost:3000/src/assets/samples/marimba-ogg.js.txt',
+    const soundfontNames = getSoundfontNames();
+    console.log('soundfontNames', soundfontNames);
+
+    this.getSoundFont(LOCAL_INSTRUMENTS[0]);
+  }
+
+  playNote(instrument: string, note: Note) {
+    const soundFont = this.getSoundFont(instrument);
+
+    if (!soundFont) {
+      return;
+    }
+
+    soundFont.load.then(() => {
+      soundFont.start({ note: note, velocity: 80 });
     });
   }
 
-  playNote(note: Note) {
-    this.soundFont.load.then(() => {
-      this.soundFont.start({ note: note, velocity: 80 });
-    });
+  private getSoundFont(instrument: string) {
+    let soundFont = this.soundFountByName.get(instrument);
+
+    if (!soundFont) {
+      const options: SoundfontOptions = LOCAL_INSTRUMENTS.includes(instrument)
+        ? {
+            instrumentUrl: new URL(`/src/assets/samples/${instrument}-ogg.js.txt`, window.location.href).href,
+          }
+        : { instrument };
+
+      soundFont = new Soundfont(context, options);
+
+      if (!soundFont) {
+        console.error(`Instrument ${instrument} not found`);
+        return;
+      }
+
+      this.soundFountByName.set(instrument, soundFont);
+    }
+
+    return soundFont;
   }
 }
 
@@ -32,7 +63,7 @@ export function initSound() {
   }
 }
 
-export function playNote(note: Note) {
+export function playNote(instrument: string, note: Note) {
   initSound();
-  player.playNote(note);
+  player.playNote(instrument, note);
 }

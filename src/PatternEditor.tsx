@@ -49,6 +49,7 @@ interface PatternEditorProps {
   patternLength: number;
   playPos: number;
   stepsPerBeat: number;
+  instrument: string;
 }
 
 export function PatternEditor(props: PatternEditorProps) {
@@ -59,7 +60,7 @@ export function PatternEditor(props: PatternEditorProps) {
     if (inputNote !== undefined) {
       const note = baseNote + inputNote;
       console.log('playNote', event.code, inputNote, getMidiNoteName(note));
-      playNote(note);
+      playNote(props.instrument, note);
     }
   }
 
@@ -77,7 +78,7 @@ export function PatternEditor(props: PatternEditorProps) {
                 stepsPerBeat={props.stepsPerBeat}
                 setNote={(note) => {
                   if (note) {
-                    playNote(note);
+                    playNote(props.instrument, note);
                   }
 
                   ensureArrayLength(props.patternMut.steps, i + 1, {});
