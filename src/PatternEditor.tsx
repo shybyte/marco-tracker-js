@@ -1,5 +1,4 @@
-import { For, Index, createEffect, createMemo } from 'solid-js';
-import { createStore, produce } from 'solid-js/store';
+import { Accessor, Index, Show, createEffect, createSignal } from 'solid-js';
 import cssClasses from './PatternEditor.module.css';
 import { playNote } from './instruments';
 import {
@@ -40,9 +39,10 @@ import {
   getMidiNoteName,
 } from './notes';
 import { Note, Pattern, PatternStep } from './song';
-import { ensureArrayLength, focusElement, range, times } from './utils/utils';
+import { ensureArrayLength, focusElement, range } from './utils/utils';
 
 const notes = range(C3, C4);
+type NoteDisplayMode = 'PianoRoll' | 'Tracker';
 
 interface PatternEditorProps {
   patternMut: Pattern;
@@ -54,6 +54,7 @@ interface PatternEditorProps {
 
 export function PatternEditor(props: PatternEditorProps) {
   const baseNote = C3;
+  const [noteDisplayMode, setNoteDisplayMode] = createSignal<NoteDisplayMode>('PianoRoll');
 
   function onKeyDown(event: KeyboardEvent) {
     const inputNote = NOTE_BY_KEY_CODE[event.code];
@@ -66,6 +67,18 @@ export function PatternEditor(props: PatternEditorProps) {
 
   return (
     <div ref={focusElement} class={cssClasses.patternEditor} tabIndex={0} onKeyDown={onKeyDown}>
+      <div class={cssClasses.noteDisplayToggle}>
+        <label>
+          Display
+          <select
+            value={noteDisplayMode()}
+            onChange={(event) => setNoteDisplayMode(event.currentTarget.value as NoteDisplayMode)}
+          >
+            <option value="PianoRoll">PianoRoll</option>
+            <option value="Tracker">Tracker</option>
+          </select>
+        </label>
+      </div>
       <table>
         <tbody>
           <Index each={range(0, props.patternLength - 1)}>
@@ -76,6 +89,7 @@ export function PatternEditor(props: PatternEditorProps) {
                 step={props.patternMut.steps[i] ?? {}}
                 isPlayPos={i === props.playPos}
                 stepsPerBeat={props.stepsPerBeat}
+                displayMode={noteDisplayMode}
                 setNote={(note) => {
                   if (note) {
                     playNote(props.instrument, note);
@@ -100,6 +114,7 @@ interface NoteRowProps {
   setNote: (note: Note | undefined) => void;
   isPlayPos: boolean;
   stepsPerBeat: number;
+  displayMode: Accessor<NoteDisplayMode>;
 }
 
 function NoteRow(props: NoteRowProps) {
@@ -112,18 +127,34 @@ function NoteRow(props: NoteRowProps) {
       >
         {props.pos}
       </td>
-      <Index each={props.notes}>
-        {(note) => (
-          <td
-            classList={{ [cssClasses.noteCell]: true, [cssClasses.noteSelected]: props.step.note === note() }}
-            onClick={() => props.setNote(props.step.note !== note() ? note() : undefined)}
-          >
-            {note()}
-          </td>
-        )}
-      </Index>
+      <Show when={props.displayMode() === 'Tracker'}>
+        {props.step.note ? formatTrackerNote(props.step.note) : '---'}
+      </Show>
+      <Show when={props.displayMode() === 'PianoRoll'}>
+        <Index each={props.notes}>
+          {(note) => {
+            const noteValue = note();
+            const label = props.displayMode() === 'Tracker' ? formatTrackerNote(noteValue) : String(noteValue);
+            return (
+              <td
+                classList={{ [cssClasses.noteCell]: true, [cssClasses.noteSelected]: props.step.note === noteValue }}
+                onClick={() => props.setNote(props.step.note !== noteValue ? noteValue : undefined)}
+              >
+                {noteValue}
+              </td>
+            );
+          }}
+        </Index>
+      </Show>
     </tr>
   );
+}
+
+function formatTrackerNote(note: Note): string {
+  const trackerNoteNames = ['C-', 'C#', 'D-', 'D#', 'E-', 'F-', 'F#', 'G-', 'G#', 'A-', 'A#', 'B-'] as const;
+  const octave = Math.floor(note / 12) - 1;
+  const noteIndex = note % 12;
+  return `${trackerNoteNames[noteIndex]}${octave}`;
 }
 
 const NOTE_BY_KEY_CODE: Partial<Record<string, Note>> = {

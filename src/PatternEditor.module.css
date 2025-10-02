@@ -1,6 +1,7 @@
 .patternEditor {
   transition: box-shadow 1s;
   border-radius: 2px;
+  padding: 10px;
 
   &:focus {
     outline: 3px solid rgba(0, 123, 255, 0.5);
@@ -11,6 +12,12 @@
   table {
     border-spacing: 5px;
   }
+}
+
+.noteDisplayToggle {
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .playPos {
