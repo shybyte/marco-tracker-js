@@ -1,9 +1,18 @@
-import { createEffect, createSignal, type Component } from 'solid-js';
+import { For, createEffect, createSignal, onCleanup, onMount, type Component } from 'solid-js';
 import { createMutable } from 'solid-js/store';
 import styles from './App.module.css';
 import { PatternEditor } from './PatternEditor';
 import { NumberInput } from './components/NumberInput';
-import { playNote } from './instruments';
+import {
+  getPlaybackMode,
+  getSelectedMidiOutputId,
+  playNote,
+  refreshMidiOutputs,
+  setPlaybackMode,
+  setSelectedMidiOutput,
+  subscribeMidiOutputs,
+  type MidiOutputInfo,
+} from './instruments';
 import { Song, createEmptySong } from './song';
 import { loadSong, saveSong } from './storage';
 import { AccurateInterval } from './utils/interval';
@@ -12,6 +21,10 @@ import { getStepTimeInSecondsForBmp } from './utils/utils';
 const App: Component = () => {
   const song = createMutable<Song>({ ...createEmptySong(), ...loadSong() });
   const [playPos, setPlayPos] = createSignal(-1);
+  const [midiOutputs, setMidiOutputs] = createSignal<MidiOutputInfo[]>([]);
+  const [selectedOutput, setSelectedOutput] = createSignal<string>(
+    getPlaybackMode() === 'internal' ? 'internal' : getSelectedMidiOutputId() ?? 'internal',
+  );
 
   let timerId: number;
 
@@ -27,6 +40,37 @@ const App: Component = () => {
   createEffect(() => {
     if (song.tempo >= 10) {
       interval.intervalSeconds = getStepTimeInSecondsForBmp(song.tempo, song.stepsPerBeat);
+    }
+  });
+
+  onMount(() => {
+    const unsubscribe = subscribeMidiOutputs((outputs) => setMidiOutputs(outputs));
+    refreshMidiOutputs();
+    onCleanup(unsubscribe);
+  });
+
+  createEffect(() => {
+    const selection = selectedOutput();
+
+    if (selection === 'internal') {
+      setPlaybackMode('internal');
+      return;
+    }
+
+    setSelectedMidiOutput(selection);
+    setPlaybackMode('midi');
+  });
+
+  createEffect(() => {
+    const outputs = midiOutputs();
+    const selection = selectedOutput();
+
+    if (selection !== 'internal' && !outputs.some((output) => output.id === selection)) {
+      if (outputs.length > 0) {
+        setSelectedOutput(outputs[0].id);
+      } else {
+        setSelectedOutput('internal');
+      }
     }
   });
 
@@ -64,6 +108,28 @@ const App: Component = () => {
             width={3}
             setValue={(value) => (song.patternLength = value)}
           />
+
+          <label>
+            Output
+            <select
+              value={selectedOutput()}
+              onChange={(event) => setSelectedOutput(event.currentTarget.value)}
+              onFocus={() => refreshMidiOutputs()}
+            >
+              <option value="internal">Internal</option>
+              <For each={midiOutputs()}>
+                {(output) => {
+                  const manufacturer = output.manufacturer ? ` (${output.manufacturer})` : '';
+                  return (
+                    <option value={output.id}>
+                      {output.name}
+                      {manufacturer}
+                    </option>
+                  );
+                }}
+              </For>
+            </select>
+          </label>
         </div>
 
         <PatternEditor

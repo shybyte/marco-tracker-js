@@ -8,7 +8,8 @@
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview",
-    "download-instruments": "node tools/download-instruments.js"
+    "download-instruments": "node tools/download-instruments.js",
+    "typecheck": "tsc --noEmit"
   },
   "license": "MIT",
   "devDependencies": {

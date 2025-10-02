@@ -1,5 +1,21 @@
 import { getSoundfontNames, Soundfont, SoundfontOptions } from 'smplr';
 import { Note } from './song';
+import {
+  getMidiOutputsSnapshot,
+  getSelectedMidiOutputId,
+  playMidiNote,
+  refreshMidiOutputs,
+  setSelectedMidiOutput,
+  subscribeMidiOutputs,
+  type MidiOutputInfo,
+} from './midi';
+
+export { getSelectedMidiOutputId, refreshMidiOutputs, setSelectedMidiOutput, subscribeMidiOutputs };
+export type { MidiOutputInfo };
+
+export type PlaybackMode = 'internal' | 'midi';
+
+let playbackMode: PlaybackMode = 'internal';
 
 let context: AudioContext;
 
@@ -53,6 +69,32 @@ class InstrumentPlayer {
 
 let player: InstrumentPlayer;
 
+export function getPlaybackMode(): PlaybackMode {
+  return playbackMode;
+}
+
+export function setPlaybackMode(mode: PlaybackMode) {
+  playbackMode = mode;
+
+  if (mode === 'midi') {
+    if (!getSelectedMidiOutputId()) {
+      const outputs = getMidiOutputsSnapshot();
+      if (outputs.length > 0) {
+        setSelectedMidiOutput(outputs[0].id);
+      }
+    }
+
+    refreshMidiOutputs().then(() => {
+      if (!getSelectedMidiOutputId()) {
+        const outputs = getMidiOutputsSnapshot();
+        if (outputs.length > 0) {
+          setSelectedMidiOutput(outputs[0].id);
+        }
+      }
+    });
+  }
+}
+
 export function initSound() {
   if (!context) {
     context = new AudioContext();
@@ -64,6 +106,15 @@ export function initSound() {
 }
 
 export function playNote(instrument: string, note: Note) {
-  initSound();
-  player.playNote(instrument, note);
+  const mode = getPlaybackMode();
+
+  switch (mode) {
+    case 'internal':
+      initSound();
+      player.playNote(instrument, note);
+      break;
+    case 'midi':
+      playMidiNote(note);
+      break;
+  }
 }
