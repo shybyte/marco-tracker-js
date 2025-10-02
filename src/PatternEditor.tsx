@@ -49,6 +49,7 @@ interface PatternEditorProps {
   patternLength: number;
   playPos: number;
   setPlayPos: Setter<number>;
+  recordMode: boolean;
   stepsPerBeat: number;
   instrument: string;
 }
@@ -58,6 +59,18 @@ export function PatternEditor(props: PatternEditorProps) {
   const [noteDisplayMode, setNoteDisplayMode] = createSignal<NoteDisplayMode>('PianoRoll');
 
   function onKeyDown(event: KeyboardEvent) {
+    if (event.key === 'Delete') {
+      event.preventDefault();
+
+      if (props.playPos >= 0 && props.playPos < props.patternLength) {
+        const step = props.patternMut.steps[props.playPos];
+        if (step) {
+          step.note = undefined;
+        }
+      }
+      return;
+    }
+
     if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
       if (props.patternLength < 1) {
         return;
@@ -95,6 +108,11 @@ export function PatternEditor(props: PatternEditorProps) {
       const note = baseNote + inputNote;
       console.log('playNote', event.code, inputNote, getMidiNoteName(note));
       playNote(props.instrument, note);
+
+      if (props.recordMode && props.playPos >= 0 && props.playPos < props.patternLength) {
+        ensureArrayLength(props.patternMut.steps, props.playPos + 1, {});
+        props.patternMut.steps[props.playPos].note = note;
+      }
     }
   }
 

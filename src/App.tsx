@@ -25,6 +25,7 @@ const App: Component = () => {
   const [selectedOutput, setSelectedOutput] = createSignal<string>(
     getPlaybackMode() === 'internal' ? 'internal' : getSelectedMidiOutputId() ?? 'internal',
   );
+  const [recordMode, setRecordMode] = createSignal(false);
 
   let timerId: number;
 
@@ -130,12 +131,18 @@ const App: Component = () => {
               </For>
             </select>
           </label>
+
+          <label>
+            Record
+            <input type="checkbox" checked={recordMode()} onChange={(event) => setRecordMode(event.currentTarget.checked)} />
+          </label>
         </div>
 
         <PatternEditor
           patternMut={song.pattern[0]}
           playPos={playPos()}
           setPlayPos={setPlayPos}
+          recordMode={recordMode()}
           stepsPerBeat={song.stepsPerBeat}
           patternLength={song.patternLength}
           instrument={song.instruments[0]}
