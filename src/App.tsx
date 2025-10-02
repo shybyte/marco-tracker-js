@@ -33,9 +33,9 @@ const App: Component = () => {
     setPlayPos((playPos() + 1) % song.patternLength);
 
     const step = song.pattern[0].steps[playPos()];
-    if (step?.note) {
-      playNote(song.instruments[0], step.note);
-    }
+    step?.notes?.forEach((note) => {
+      playNote(song.instruments[0], note);
+    });
   });
 
   createEffect(() => {

@@ -7,7 +7,7 @@ export function loadSong(): Song | undefined {
     return undefined;
   }
 
-  return JSON.parse(storedString);
+  return JSON.parse(storedString) as Song;
 }
 
 export function saveSong(song: Song) {

@@ -1,4 +1,3 @@
-import { F0 } from './notes';
 import { times } from './utils/utils';
 
 export interface Song {
@@ -16,7 +15,11 @@ export interface Pattern {
 export type Note = number;
 
 export interface PatternStep {
-  note?: Note;
+  notes: Note[];
+}
+
+export function createEmptyPatternStep(): PatternStep {
+  return { notes: [] };
 }
 
 export function createEmptySong(): Song {
@@ -31,5 +34,5 @@ export function createEmptySong(): Song {
 }
 
 export function createEmptyPattern(length: number): Pattern {
-  return { steps: times(length, () => ({ note: undefined })) };
+  return { steps: times(length, () => createEmptyPatternStep()) };
 }

@@ -38,7 +38,7 @@ import {
   H_1,
   getMidiNoteName,
 } from './notes';
-import { Note, Pattern, PatternStep } from './song';
+import { Note, Pattern, PatternStep, createEmptyPatternStep } from './song';
 import { ensureArrayLength, focusElement, range } from './utils/utils';
 
 const notes = range(C3, C4);
@@ -65,7 +65,7 @@ export function PatternEditor(props: PatternEditorProps) {
       if (props.playPos >= 0 && props.playPos < props.patternLength) {
         const step = props.patternMut.steps[props.playPos];
         if (step) {
-          step.note = undefined;
+          step.notes = [];
         }
       }
       return;
@@ -110,8 +110,14 @@ export function PatternEditor(props: PatternEditorProps) {
       playNote(props.instrument, note);
 
       if (props.recordMode && props.playPos >= 0 && props.playPos < props.patternLength) {
-        ensureArrayLength(props.patternMut.steps, props.playPos + 1, {});
-        props.patternMut.steps[props.playPos].note = note;
+        ensureArrayLength(props.patternMut.steps, props.playPos + 1, createEmptyPatternStep());
+        const step = props.patternMut.steps[props.playPos];
+        if (!Array.isArray(step.notes)) {
+          step.notes = [];
+        }
+        if (!step.notes.includes(note)) {
+          step.notes.push(note);
+        }
       }
     }
   }
@@ -137,17 +143,30 @@ export function PatternEditor(props: PatternEditorProps) {
               <NoteRow
                 pos={i}
                 notes={notes}
-                step={props.patternMut.steps[i] ?? {}}
+                step={props.patternMut.steps[i] ?? createEmptyPatternStep()}
                 isPlayPos={i === props.playPos}
                 stepsPerBeat={props.stepsPerBeat}
                 displayMode={noteDisplayMode}
-                setNote={(note) => {
-                  if (note) {
+                toggleNote={(note) => {
+                  const step = props.patternMut.steps[i];
+                  const exists = step?.notes.includes(note);
+
+                  if (!exists) {
                     playNote(props.instrument, note);
                   }
 
-                  ensureArrayLength(props.patternMut.steps, i + 1, {});
-                  props.patternMut.steps[i].note = note;
+                  ensureArrayLength(props.patternMut.steps, i + 1, createEmptyPatternStep());
+                  const targetStep = props.patternMut.steps[i];
+                  if (!Array.isArray(targetStep.notes)) {
+                    targetStep.notes = [];
+                  }
+                  const noteIndex = targetStep.notes.indexOf(note);
+
+                  if (noteIndex === -1) {
+                    targetStep.notes.push(note);
+                  } else {
+                    targetStep.notes.splice(noteIndex, 1);
+                  }
                 }}
               />
             )}
@@ -162,7 +181,7 @@ interface NoteRowProps {
   pos: number;
   notes: Note[];
   step: PatternStep;
-  setNote: (note: Note | undefined) => void;
+  toggleNote: (note: Note) => void;
   isPlayPos: boolean;
   stepsPerBeat: number;
   displayMode: Accessor<NoteDisplayMode>;
@@ -179,7 +198,7 @@ function NoteRow(props: NoteRowProps) {
         {props.pos}
       </td>
       <Show when={props.displayMode() === 'Tracker'}>
-        {props.step.note ? formatTrackerNote(props.step.note) : '---'}
+        {props.step.notes.length > 0 ? formatTrackerNotes(props.step.notes) : '---'}
       </Show>
       <Show when={props.displayMode() === 'PianoRoll'}>
         <Index each={props.notes}>
@@ -188,8 +207,11 @@ function NoteRow(props: NoteRowProps) {
             const label = props.displayMode() === 'Tracker' ? formatTrackerNote(noteValue) : String(noteValue);
             return (
               <td
-                classList={{ [cssClasses.noteCell]: true, [cssClasses.noteSelected]: props.step.note === noteValue }}
-                onClick={() => props.setNote(props.step.note !== noteValue ? noteValue : undefined)}
+                classList={{
+                  [cssClasses.noteCell]: true,
+                  [cssClasses.noteSelected]: props.step.notes.includes(noteValue),
+                }}
+                onClick={() => props.toggleNote(noteValue)}
               >
                 {noteValue}
               </td>
@@ -206,6 +228,10 @@ function formatTrackerNote(note: Note): string {
   const octave = Math.floor(note / 12) - 1;
   const noteIndex = note % 12;
   return `${trackerNoteNames[noteIndex]}${octave}`;
+}
+
+function formatTrackerNotes(notes: Note[]): string {
+  return notes.map((note) => formatTrackerNote(note)).join(' ');
 }
 
 const NOTE_BY_KEY_CODE: Partial<Record<string, Note>> = {
