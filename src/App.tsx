@@ -135,6 +135,7 @@ const App: Component = () => {
         <PatternEditor
           patternMut={song.pattern[0]}
           playPos={playPos()}
+          setPlayPos={setPlayPos}
           stepsPerBeat={song.stepsPerBeat}
           patternLength={song.patternLength}
           instrument={song.instruments[0]}

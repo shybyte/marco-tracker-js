@@ -1,4 +1,4 @@
-import { Accessor, Index, Show, createEffect, createSignal } from 'solid-js';
+import { Accessor, Index, Setter, Show, createSignal } from 'solid-js';
 import cssClasses from './PatternEditor.module.css';
 import { playNote } from './instruments';
 import {
@@ -48,6 +48,7 @@ interface PatternEditorProps {
   patternMut: Pattern;
   patternLength: number;
   playPos: number;
+  setPlayPos: Setter<number>;
   stepsPerBeat: number;
   instrument: string;
 }
@@ -57,6 +58,38 @@ export function PatternEditor(props: PatternEditorProps) {
   const [noteDisplayMode, setNoteDisplayMode] = createSignal<NoteDisplayMode>('PianoRoll');
 
   function onKeyDown(event: KeyboardEvent) {
+    if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+      if (props.patternLength < 1) {
+        return;
+      }
+
+      event.preventDefault();
+
+      if (event.key === 'ArrowUp') {
+        if (props.playPos < 0) {
+          props.setPlayPos(0);
+        } else {
+          const nextPos = Math.min(props.patternLength - 1, Math.max(0, props.playPos - 1));
+          if (nextPos !== props.playPos) {
+            props.setPlayPos(nextPos);
+          }
+        }
+        return;
+      }
+
+      if (event.key === 'ArrowDown') {
+        if (props.playPos < 0) {
+          props.setPlayPos(0);
+        } else {
+          const nextPos = Math.min(props.patternLength - 1, props.playPos + 1);
+          if (nextPos !== props.playPos) {
+            props.setPlayPos(nextPos);
+          }
+        }
+        return;
+      }
+    }
+
     const inputNote = NOTE_BY_KEY_CODE[event.code];
     if (inputNote !== undefined) {
       const note = baseNote + inputNote;
