@@ -112,9 +112,6 @@ export function PatternEditor(props: PatternEditorProps) {
       if (props.recordMode && props.playPos >= 0 && props.playPos < props.patternLength) {
         ensureArrayLength(props.patternMut.steps, props.playPos + 1, createEmptyPatternStep());
         const step = props.patternMut.steps[props.playPos];
-        if (!Array.isArray(step.notes)) {
-          step.notes = [];
-        }
         if (!step.notes.includes(note)) {
           step.notes.push(note);
         }
