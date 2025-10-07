@@ -1,17 +1,16 @@
 Doing:
 
-- Midi Instrument
-
 TODO:
 
 - Select Instrument
 - Note Duration
 - Select Scale per channel
-- Multiple notes per step and channel
 - Set keyboard octave
 
 Done:
 
+- Midi Instrument
+- Multiple notes per step and channel
 - Set Pattern length
 - Set stepsPerBeat
 - Store bpm with song
