@@ -11,6 +11,15 @@
         "clear": true
       },
       "problemMatcher": []
+    },
+    {
+      "label": "typecheck",
+      "type": "shell",
+      "command": "bun run typecheck",
+      "presentation": {
+        "clear": true
+      },
+      "problemMatcher": []
     }
   ]
 }

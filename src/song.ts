@@ -1,6 +1,6 @@
 import { times } from './utils/utils';
 
-type PatternID = string;
+export type PatternID = string;
 
 export interface Song {
   tempo: number;

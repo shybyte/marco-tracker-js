@@ -1,6 +1,6 @@
 import { Index, Setter, Show } from 'solid-js';
 import { PatternEditor } from './PatternEditor';
-import type { Pattern, Song } from './song';
+import type { Pattern, PatternID, Song } from './song';
 import styles from './FrameEditor.module.css';
 
 interface FrameEditorProps {
@@ -14,7 +14,7 @@ interface FrameEditorProps {
   stepsPerBeat: number;
 }
 
-function resolvePattern(patterns: Pattern[], patternId: number | null | undefined): Pattern | undefined {
+function resolvePattern(patterns: Pattern[], patternId: PatternID | null | undefined): Pattern | undefined {
   if (patternId === null || patternId === undefined) {
     return undefined;
   }
