@@ -51,3 +51,43 @@ export function createEmptySong(): Song {
 function createEmptyPattern(id: number, length: number): Pattern {
   return { id, steps: times(length, () => createEmptyPatternStep()) };
 }
+
+export function normalizeSong(song: Song): Song {
+  if (!Array.isArray(song.patterns)) {
+    song.patterns = [];
+  }
+
+  song.patterns.forEach((pattern, index) => {
+    if (pattern.id === undefined || pattern.id === null) {
+      pattern.id = index;
+    }
+
+    if (!Array.isArray(pattern.steps)) {
+      pattern.steps = [];
+    }
+  });
+
+  if (!Array.isArray(song.frames)) {
+    song.frames = [];
+  }
+
+  if (song.frames.length === 0 && song.patterns.length > 0) {
+    song.frames = [{ channels: song.patterns.map((pattern) => pattern.id ?? null) }];
+  }
+
+  song.frames.forEach((frame) => {
+    if (!Array.isArray(frame.channels)) {
+      frame.channels = [];
+    }
+
+    frame.channels = frame.channels.map((patternId) => (patternId === undefined ? null : patternId));
+
+    const hasAssignedChannel = frame.channels.some((patternId) => patternId !== null && patternId !== undefined);
+    if (!hasAssignedChannel && song.patterns.length > 0) {
+      const channelCount = Math.max(frame.channels.length, song.patterns.length, song.instruments.length);
+      frame.channels = Array.from({ length: channelCount }, (_, index) => song.patterns[index]?.id ?? null);
+    }
+  });
+
+  return song;
+}

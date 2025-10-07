@@ -12,7 +12,7 @@ import {
   subscribeMidiOutputs,
   type MidiOutputInfo,
 } from './instruments';
-import { Song, createEmptySong } from './song';
+import { Song, createEmptySong, normalizeSong } from './song';
 import { loadSong, saveSong } from './storage';
 import { AccurateInterval } from './utils/interval';
 import { getStepTimeInSecondsForBmp } from './utils/utils';
@@ -20,11 +20,11 @@ import { PatternMatrix } from './PatternMatrix';
 import { FrameEditor } from './FrameEditor';
 
 const App: Component = () => {
-  const song = createMutable<Song>({ ...createEmptySong(), ...loadSong() });
+  const song = createMutable<Song>(normalizeSong({ ...createEmptySong(), ...loadSong() }));
   const [playPos, setPlayPos] = createSignal(-1);
   const [midiOutputs, setMidiOutputs] = createSignal<MidiOutputInfo[]>([]);
   const [selectedOutput, setSelectedOutput] = createSignal<string>(
-    getPlaybackMode() === 'internal' ? 'internal' : getSelectedMidiOutputId() ?? 'internal',
+    getPlaybackMode() === 'internal' ? 'internal' : getSelectedMidiOutputId() ?? 'internal'
   );
   const [recordMode, setRecordMode] = createSignal(false);
   const [selectedFrameIndex, setSelectedFrameIndex] = createSignal(0);
@@ -38,17 +38,25 @@ const App: Component = () => {
       return;
     }
 
-    const firstPatternId = currentFrame.channels[0];
-    if (firstPatternId === null || firstPatternId === undefined) {
-      return;
-    }
+    currentFrame.channels.forEach((patternId, channelIndex) => {
+      if (patternId === null || patternId === undefined) {
+        return;
+      }
 
-    const pattern = song.patterns.find((candidatePattern) => candidatePattern.id === firstPatternId);
-    const instrument = song.instruments[0];
+      const pattern = song.patterns.find((candidatePattern) => candidatePattern.id === patternId);
+      if (!pattern) {
+        return;
+      }
 
-    const step = pattern?.steps[playPos()];
-    step?.notes?.forEach((note) => {
-      playNote(instrument, note);
+      const instrument = song.instruments[channelIndex] ?? song.instruments[0];
+      if (!instrument) {
+        return;
+      }
+
+      const step = pattern.steps[playPos()];
+      step?.notes?.forEach((note) => {
+        playNote(instrument, note);
+      });
     });
   });
 
@@ -172,8 +180,16 @@ const App: Component = () => {
         <div class={styles.editorLayout}>
           <PatternMatrix
             frames={song.frames}
+            patterns={song.patterns}
             selectedFrame={selectedFrameIndex()}
             onSelectFrame={(index) => setSelectedFrameIndex(index)}
+            onAssignChannel={(frameIndex, channelIndex, patternId) => {
+              const frame = song.frames[frameIndex];
+              if (!frame) {
+                return;
+              }
+              frame.channels[channelIndex] = patternId;
+            }}
           />
           <Show when={currentFrame()} fallback={<div class={styles.framePlaceholder}>No frame selected</div>}>
             {(frame) => (
