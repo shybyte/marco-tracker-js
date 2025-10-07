@@ -32,7 +32,7 @@ const App: Component = () => {
   const interval = new AccurateInterval(getStepTimeInSecondsForBmp(song.tempo, song.stepsPerBeat), () => {
     setPlayPos((playPos() + 1) % song.patternLength);
 
-    const step = song.pattern[0].steps[playPos()];
+    const step = song.patterns[0].steps[playPos()];
     step?.notes?.forEach((note) => {
       playNote(song.instruments[0], note);
     });
@@ -134,12 +134,16 @@ const App: Component = () => {
 
           <label>
             Record
-            <input type="checkbox" checked={recordMode()} onChange={(event) => setRecordMode(event.currentTarget.checked)} />
+            <input
+              type="checkbox"
+              checked={recordMode()}
+              onChange={(event) => setRecordMode(event.currentTarget.checked)}
+            />
           </label>
         </div>
 
         <PatternEditor
-          patternMut={song.pattern[0]}
+          patternMut={song.patterns[0]}
           playPos={playPos()}
           setPlayPos={setPlayPos}
           recordMode={recordMode()}
