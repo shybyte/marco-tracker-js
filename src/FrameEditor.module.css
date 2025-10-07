@@ -1,0 +1,23 @@
+.frameEditor {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.channelColumn {
+  flex: 1 1 0;
+  min-width: 240px;
+}
+
+.channelHeader {
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.channelPlaceholder {
+  padding: 16px;
+  border: 1px dashed #666;
+  border-radius: 4px;
+  color: #888;
+  text-align: center;
+}

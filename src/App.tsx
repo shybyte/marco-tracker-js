@@ -1,7 +1,6 @@
-import { For, createEffect, createSignal, onCleanup, onMount, type Component } from 'solid-js';
+import { For, Show, createEffect, createSignal, onCleanup, onMount, type Component } from 'solid-js';
 import { createMutable } from 'solid-js/store';
 import styles from './App.module.css';
-import { PatternEditor } from './PatternEditor';
 import { NumberInput } from './components/NumberInput';
 import {
   getPlaybackMode,
@@ -17,6 +16,8 @@ import { Song, createEmptySong } from './song';
 import { loadSong, saveSong } from './storage';
 import { AccurateInterval } from './utils/interval';
 import { getStepTimeInSecondsForBmp } from './utils/utils';
+import { PatternMatrix } from './PatternMatrix';
+import { FrameEditor } from './FrameEditor';
 
 const App: Component = () => {
   const song = createMutable<Song>({ ...createEmptySong(), ...loadSong() });
@@ -26,15 +27,28 @@ const App: Component = () => {
     getPlaybackMode() === 'internal' ? 'internal' : getSelectedMidiOutputId() ?? 'internal',
   );
   const [recordMode, setRecordMode] = createSignal(false);
+  const [selectedFrameIndex, setSelectedFrameIndex] = createSignal(0);
 
   let timerId: number;
 
   const interval = new AccurateInterval(getStepTimeInSecondsForBmp(song.tempo, song.stepsPerBeat), () => {
     setPlayPos((playPos() + 1) % song.patternLength);
+    const currentFrame = song.frames[selectedFrameIndex()];
+    if (!currentFrame) {
+      return;
+    }
 
-    const step = song.patterns[0].steps[playPos()];
+    const firstPatternId = currentFrame.channels[0];
+    if (firstPatternId === null || firstPatternId === undefined) {
+      return;
+    }
+
+    const pattern = song.patterns.find((candidatePattern) => candidatePattern.id === firstPatternId);
+    const instrument = song.instruments[0];
+
+    const step = pattern?.steps[playPos()];
     step?.notes?.forEach((note) => {
-      playNote(song.instruments[0], note);
+      playNote(instrument, note);
     });
   });
 
@@ -84,10 +98,24 @@ const App: Component = () => {
     interval.stop();
   }
 
+  createEffect(() => {
+    const framesLength = song.frames.length;
+    if (framesLength === 0) {
+      setSelectedFrameIndex(0);
+      return;
+    }
+    const currentSelection = selectedFrameIndex();
+    if (currentSelection >= framesLength) {
+      setSelectedFrameIndex(framesLength - 1);
+    }
+  });
+
+  const currentFrame = () => song.frames[selectedFrameIndex()];
+
   return (
     <div class={styles.App}>
       <header class={styles.header}>MarcoTracker</header>
-      <main>
+      <main class={styles.main}>
         <div role="toolbar">
           <button onClick={() => Object.assign(song, loadSong())}>Load</button>
           <button onClick={() => saveSong(song)}>Save</button>
@@ -141,16 +169,27 @@ const App: Component = () => {
             />
           </label>
         </div>
-
-        <PatternEditor
-          patternMut={song.patterns[0]}
-          playPos={playPos()}
-          setPlayPos={setPlayPos}
-          recordMode={recordMode()}
-          stepsPerBeat={song.stepsPerBeat}
-          patternLength={song.patternLength}
-          instrument={song.instruments[0]}
-        />
+        <div class={styles.editorLayout}>
+          <PatternMatrix
+            frames={song.frames}
+            selectedFrame={selectedFrameIndex()}
+            onSelectFrame={(index) => setSelectedFrameIndex(index)}
+          />
+          <Show when={currentFrame()} fallback={<div class={styles.framePlaceholder}>No frame selected</div>}>
+            {(frame) => (
+              <FrameEditor
+                frame={frame()}
+                patterns={song.patterns}
+                instruments={song.instruments}
+                patternLength={song.patternLength}
+                playPos={playPos()}
+                setPlayPos={setPlayPos}
+                recordMode={recordMode()}
+                stepsPerBeat={song.stepsPerBeat}
+              />
+            )}
+          </Show>
+        </div>
       </main>
     </div>
   );

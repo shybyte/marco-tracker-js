@@ -1,0 +1,29 @@
+.patternMatrix {
+  width: 200px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  border: 1px solid #444;
+  padding: 4px 6px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.headerCell {
+  background-color: #222;
+  color: #fff;
+}
+
+.emptyCell {
+  color: #666;
+}
+
+.selectedRow {
+  background-color: rgba(0, 123, 255, 0.2);
+}
