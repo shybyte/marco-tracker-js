@@ -25,3 +25,13 @@ export function ensureArrayLength<T>(arrayMut: T[], length: number, fillElement:
     arrayMut.push(structuredClone(fillElement));
   }
 }
+
+export function maxBy<T>(items: readonly T[], getValue: (item: T) => number): number {
+  let maxValue = Number.NEGATIVE_INFINITY;
+
+  for (const item of items) {
+    maxValue = Math.max(maxValue, getValue(item));
+  }
+
+  return maxValue === Number.NEGATIVE_INFINITY ? 0 : maxValue;
+}

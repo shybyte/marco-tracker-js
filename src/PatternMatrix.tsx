@@ -1,17 +1,18 @@
 import { For } from 'solid-js';
 import type { Song } from './song';
 import styles from './PatternMatrix.module.css';
+import { maxBy } from './utils/utils';
 
 interface PatternMatrixProps {
   frames: Song['frames'];
   patterns: Song['patterns'];
   selectedFrame: number;
   onSelectFrame: (index: number) => void;
-  onAssignChannel: (frameIndex: number, channelIndex: number, patternId: number | null) => void;
+  onAssignChannel: (frameIndex: number, channelIndex: number, patternId: string | null) => void;
 }
 
 export function PatternMatrix(props: PatternMatrixProps) {
-  const maxChannels = () => props.frames.reduce((max, frame) => Math.max(max, frame.channels.length), 0);
+  const maxChannels = () => maxBy(props.frames, (frame) => frame.channels.length);
 
   return (
     <div class={styles.patternMatrix}>
@@ -36,23 +37,22 @@ export function PatternMatrix(props: PatternMatrixProps) {
                 <td>{index() + 1}</td>
                 <For each={Array.from({ length: maxChannels() })}>
                   {(_, channelIndex) => {
-                    const patternId = () => frame.channels[channelIndex()] ?? null;
                     return (
                       <td>
                         <select
                           class={styles.patternSelect}
-                          value={patternId() === null ? '' : String(patternId())}
+                          value={frame.channels[channelIndex()] || ''}
                           onClick={(event) => event.stopPropagation()}
                           onMouseDown={(event) => event.stopPropagation()}
                           onChange={(event) => {
                             const value = event.currentTarget.value;
-                            const nextPatternId = value === '' ? null : Number(value);
+                            const nextPatternId = value || null;
                             props.onAssignChannel(index(), channelIndex(), nextPatternId);
                           }}
                         >
                           <option value="">--</option>
                           <For each={props.patterns}>
-                            {(pattern) => <option value={String(pattern.id)}>{pattern.id}</option>}
+                            {(pattern) => <option value={pattern.id}>{pattern.id}</option>}
                           </For>
                         </select>
                       </td>

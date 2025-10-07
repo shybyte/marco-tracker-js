@@ -201,7 +201,6 @@ function NoteRow(props: NoteRowProps) {
         <Index each={props.notes}>
           {(note) => {
             const noteValue = note();
-            const label = props.displayMode() === 'Tracker' ? formatTrackerNote(noteValue) : String(noteValue);
             return (
               <td
                 classList={{

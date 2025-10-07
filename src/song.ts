@@ -1,6 +1,6 @@
 import { times } from './utils/utils';
 
-type PatternID = number;
+type PatternID = string;
 
 export interface Song {
   tempo: number;
@@ -32,8 +32,8 @@ export function createEmptyPatternStep(): PatternStep {
 
 export function createEmptySong(): Song {
   const patternLength = 16;
-  const emptyPattern1 = createEmptyPattern(0, patternLength);
-  const emptyPattern2 = createEmptyPattern(1, patternLength);
+  const emptyPattern1 = createEmptyPattern('0', patternLength);
+  const emptyPattern2 = createEmptyPattern('1', patternLength);
   return {
     tempo: 120,
     stepsPerBeat: 4,
@@ -48,7 +48,7 @@ export function createEmptySong(): Song {
   };
 }
 
-function createEmptyPattern(id: number, length: number): Pattern {
+function createEmptyPattern(id: PatternID, length: number): Pattern {
   return { id, steps: times(length, () => createEmptyPatternStep()) };
 }
 
@@ -59,7 +59,7 @@ export function normalizeSong(song: Song): Song {
 
   song.patterns.forEach((pattern, index) => {
     if (pattern.id === undefined || pattern.id === null) {
-      pattern.id = index;
+      pattern.id = String(index);
     }
 
     if (!Array.isArray(pattern.steps)) {
