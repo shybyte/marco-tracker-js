@@ -1,5 +1,7 @@
 import type { Note } from './song';
 
+export type MidiCannel = number;
+
 type NavigatorWithMidi = Navigator & {
   requestMIDIAccess?: (options?: unknown) => Promise<MIDIAccess>;
 };
@@ -70,7 +72,7 @@ function initMidi() {
   return midiInitPromise;
 }
 
-export function playMidiNote(note: Note) {
+export function playMidiNote(channel: MidiCannel, note: Note) {
   if (note < 0 || note > 127) {
     return;
   }
@@ -91,8 +93,8 @@ export function playMidiNote(note: Note) {
     const now = performance.now();
 
     outputsToUse.forEach((output) => {
-      output.send([noteOn, note, velocity]);
-      output.send([noteOff, note, 0], now + releaseDelayMs);
+      output.send([noteOn + channel, note, velocity]);
+      output.send([noteOff + channel, note, 0], now + releaseDelayMs);
     });
   });
 }

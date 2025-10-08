@@ -6,7 +6,6 @@ import styles from './FrameEditor.module.css';
 interface FrameEditorProps {
   frame: Song['frames'][number];
   patterns: Song['patterns'];
-  instruments: Song['instruments'];
   patternLength: number;
   playPos: number;
   setPlayPos: Setter<number>;
@@ -27,7 +26,6 @@ export function FrameEditor(props: FrameEditorProps) {
       <Index each={props.frame.channels}>
         {(patternIdAccessor, channelIndex) => {
           const resolvedPattern = () => resolvePattern(props.patterns, patternIdAccessor());
-          const resolvedInstrument = () => props.instruments[channelIndex] ?? props.instruments[0] ?? 'internal';
 
           return (
             <div class={styles.channelColumn}>
@@ -41,7 +39,7 @@ export function FrameEditor(props: FrameEditorProps) {
                     setPlayPos={props.setPlayPos}
                     recordMode={props.recordMode}
                     stepsPerBeat={props.stepsPerBeat}
-                    instrument={resolvedInstrument()}
+                    channel={channelIndex}
                   />
                 )}
               </Show>

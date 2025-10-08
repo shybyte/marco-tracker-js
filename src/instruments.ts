@@ -3,12 +3,13 @@ import { Note } from './song';
 import {
   getMidiOutputsSnapshot,
   getSelectedMidiOutputId,
+  MidiCannel,
   playMidiNote,
   refreshMidiOutputs,
   setSelectedMidiOutput,
   subscribeMidiOutputs,
   type MidiOutputInfo,
-} from './midi';
+} from './midi-output';
 
 export { getSelectedMidiOutputId, refreshMidiOutputs, setSelectedMidiOutput, subscribeMidiOutputs };
 export type { MidiOutputInfo };
@@ -105,16 +106,16 @@ export function initSound() {
   }
 }
 
-export function playNote(instrument: string, note: Note) {
+export function playNote(channel: MidiCannel, note: Note) {
   const mode = getPlaybackMode();
 
   switch (mode) {
     case 'internal':
       initSound();
-      player.playNote(instrument, note);
+      player.playNote('marimba', note);
       break;
     case 'midi':
-      playMidiNote(note);
+      playMidiNote(channel, note);
       break;
   }
 }

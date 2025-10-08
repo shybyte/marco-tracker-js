@@ -40,6 +40,7 @@ import {
 } from './notes';
 import { Note, Pattern, PatternStep, createEmptyPatternStep } from './song';
 import { ensureArrayLength, focusElement, range } from './utils/utils';
+import { MidiCannel } from './midi-output';
 
 const notes = range(C3, C4);
 type NoteDisplayMode = 'PianoRoll' | 'Tracker';
@@ -51,7 +52,7 @@ interface PatternEditorProps {
   setPlayPos: Setter<number>;
   recordMode: boolean;
   stepsPerBeat: number;
-  instrument: string;
+  channel: MidiCannel;
 }
 
 export function PatternEditor(props: PatternEditorProps) {
@@ -107,7 +108,7 @@ export function PatternEditor(props: PatternEditorProps) {
     if (inputNote !== undefined) {
       const note = baseNote + inputNote;
       console.log('playNote', event.code, inputNote, getMidiNoteName(note));
-      playNote(props.instrument, note);
+      playNote(props.channel, note);
 
       if (props.recordMode && props.playPos >= 0 && props.playPos < props.patternLength) {
         ensureArrayLength(props.patternMut.steps, props.playPos + 1, createEmptyPatternStep());
@@ -149,7 +150,7 @@ export function PatternEditor(props: PatternEditorProps) {
                   const exists = step?.notes.includes(note);
 
                   if (!exists) {
-                    playNote(props.instrument, note);
+                    playNote(props.channel, note);
                   }
 
                   ensureArrayLength(props.patternMut.steps, i + 1, createEmptyPatternStep());

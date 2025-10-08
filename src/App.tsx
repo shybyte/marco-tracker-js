@@ -29,8 +29,6 @@ const App: Component = () => {
   const [recordMode, setRecordMode] = createSignal(false);
   const [selectedFrameIndex, setSelectedFrameIndex] = createSignal(0);
 
-  let timerId: number;
-
   const interval = new AccurateInterval(getStepTimeInSecondsForBmp(song.tempo, song.stepsPerBeat), () => {
     setPlayPos((playPos() + 1) % song.patternLength);
     const currentFrame = song.frames[selectedFrameIndex()];
@@ -48,14 +46,9 @@ const App: Component = () => {
         return;
       }
 
-      const instrument = song.instruments[channelIndex] ?? song.instruments[0];
-      if (!instrument) {
-        return;
-      }
-
       const step = pattern.steps[playPos()];
       step?.notes?.forEach((note) => {
-        playNote(instrument, note);
+        playNote(channelIndex, note);
       });
     });
   });
@@ -196,7 +189,6 @@ const App: Component = () => {
               <FrameEditor
                 frame={frame()}
                 patterns={song.patterns}
-                instruments={song.instruments}
                 patternLength={song.patternLength}
                 playPos={playPos()}
                 setPlayPos={setPlayPos}

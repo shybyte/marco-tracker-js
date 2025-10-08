@@ -8,7 +8,6 @@ export interface Song {
   patternLength: number;
   patterns: Pattern[];
   frames: Frame[];
-  instruments: string[];
 }
 
 interface Frame {
@@ -38,7 +37,6 @@ export function createEmptySong(): Song {
     tempo: 120,
     stepsPerBeat: 4,
     patternLength: patternLength,
-    instruments: ['marimba'],
     frames: [
       { channels: [emptyPattern1.id, null] }, //
       { channels: [emptyPattern1.id, emptyPattern2.id] },
@@ -84,7 +82,7 @@ export function normalizeSong(song: Song): Song {
 
     const hasAssignedChannel = frame.channels.some((patternId) => patternId !== null && patternId !== undefined);
     if (!hasAssignedChannel && song.patterns.length > 0) {
-      const channelCount = Math.max(frame.channels.length, song.patterns.length, song.instruments.length);
+      const channelCount = Math.max(frame.channels.length, song.patterns.length);
       frame.channels = Array.from({ length: channelCount }, (_, index) => song.patterns[index]?.id ?? null);
     }
   });
