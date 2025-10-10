@@ -41,10 +41,7 @@ export function createEmptySong(): Song {
     tempo: 120,
     stepsPerBeat: 4,
     patternLength: patternLength,
-    channels: [
-      { patterns: [channel0Pattern] },
-      { patterns: [channel1Pattern] },
-    ],
+    channels: [{ patterns: [channel0Pattern] }, { patterns: [channel1Pattern] }],
     frames: [
       { channels: [channel0Pattern.id, null] }, //
       { channels: [channel0Pattern.id, channel1Pattern.id] },
