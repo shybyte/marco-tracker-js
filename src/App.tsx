@@ -12,7 +12,7 @@ import {
   subscribeMidiOutputs,
   type MidiOutputInfo,
 } from './instruments';
-import { Song, createEmptySong, normalizeSong, createPatternForChannel } from './song';
+import { Song, createEmptySong, normalizeSong, createPatternForChannel, insertFrame } from './song';
 import { loadSong, saveSong } from './storage';
 import { AccurateInterval } from './utils/interval';
 import { getStepTimeInSecondsForBmp } from './utils/utils';
@@ -119,6 +119,11 @@ const App: Component = () => {
 
   const currentFrame = () => song.frames[selectedFrameIndex()];
 
+  function handleInsertFrame(insertIndex: number) {
+    insertFrame(song, insertIndex);
+    setSelectedFrameIndex(insertIndex);
+  }
+
   return (
     <div class={styles.App}>
       <header class={styles.header}>MarcoTracker</header>
@@ -190,6 +195,7 @@ const App: Component = () => {
               }
               frame.channels[channelIndex] = patternId;
             }}
+            onInsertFrame={handleInsertFrame}
           />
           <Show when={currentFrame()} fallback={<div class={styles.framePlaceholder}>No frame selected</div>}>
             {(frame) => (

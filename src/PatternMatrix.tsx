@@ -2,6 +2,7 @@ import { For } from 'solid-js';
 import type { Song } from './song';
 import styles from './PatternMatrix.module.css';
 import { maxBy } from './utils/utils';
+import { ContextMenu, createContextMenuController } from './components/ContextMenu';
 
 interface PatternMatrixProps {
   frames: Song['frames'];
@@ -10,6 +11,7 @@ interface PatternMatrixProps {
   onSelectFrame: (index: number) => void;
   onAssignChannel: (frameIndex: number, channelIndex: number, patternId: string | null) => void;
   onCreatePattern: (channelIndex: number) => string;
+  onInsertFrame: (insertIndex: number) => void;
 }
 
 const NEW_PATTERN_VALUE = '__new_pattern__';
@@ -21,8 +23,17 @@ export function PatternMatrix(props: PatternMatrixProps) {
       maxBy(props.frames, (frame) => frame.channels.length)
     );
 
+  const contextMenu = createContextMenuController<number | null>();
+
+  const handleAddRow = () => {
+    const targetIndex = contextMenu.data();
+    const insertIndex = targetIndex == null ? props.frames.length : targetIndex + 1;
+    contextMenu.close();
+    props.onInsertFrame(insertIndex);
+  };
+
   return (
-    <div class={styles.patternMatrix}>
+    <div class={styles.patternMatrix} onContextMenu={(event) => contextMenu.open(event, null)}>
       <table class={styles.table}>
         <thead>
           <tr>
@@ -40,6 +51,7 @@ export function PatternMatrix(props: PatternMatrixProps) {
                   [styles.selectedRow]: index() === props.selectedFrame,
                 }}
                 onClick={() => props.onSelectFrame(index())}
+                onContextMenu={(event) => contextMenu.open(event, index())}
               >
                 <td>{index() + 1}</td>
                 <For each={Array.from({ length: maxChannels() })}>
@@ -79,6 +91,11 @@ export function PatternMatrix(props: PatternMatrixProps) {
           </For>
         </tbody>
       </table>
+      <ContextMenu anchor={contextMenu.anchor} onClose={contextMenu.close}>
+        <button type="button" onClick={handleAddRow} role="menuitem">
+          Add Row Below
+        </button>
+      </ContextMenu>
     </div>
   );
 }

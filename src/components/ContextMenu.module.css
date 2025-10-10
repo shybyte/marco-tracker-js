@@ -1,0 +1,40 @@
+.menu {
+  position: fixed;
+  min-width: 120px;
+  padding: 4px 0;
+  background-color: rgba(32, 32, 32, 0.95);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 8px 24px rgba(0, 0, 0, 0.45),
+    0 0 18px rgba(0, 174, 255, 0.35);
+  font-size: 0.85rem;
+  display: none;
+  margin: 0;
+  inset: auto;
+  width: max-content;
+}
+
+.menu:popover-open {
+  display: block;
+}
+
+.menu button {
+  appearance: none;
+  background: none;
+  border: none;
+  color: inherit;
+  padding: 6px 12px;
+  text-align: left;
+  font: inherit;
+  width: 100%;
+  cursor: pointer;
+}
+
+.menu button:hover,
+.menu button:focus {
+  background-color: rgba(255, 255, 255, 0.12);
+  outline: none;
+}

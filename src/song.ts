@@ -1,4 +1,4 @@
-import { times } from './utils/utils';
+import { maxBy, times } from './utils/utils';
 
 export type PatternID = string; // unique relative to the channel
 
@@ -126,4 +126,21 @@ export function createPatternForChannel(song: Song, channelIndex: number): Patte
   channel.patterns.push(pattern);
 
   return pattern.id;
+}
+
+export function insertFrame(song: Song, insertIndex: number): void {
+  const frames = song.frames;
+  const channelCount = Math.max(song.channels.length, maxBy(frames, (frame) => frame.channels.length));
+
+  const templateFrame = frames[insertIndex - 1] ?? frames[insertIndex];
+
+  const channels = Array.from({ length: channelCount }, (_, channelIndex) => {
+    if (templateFrame) {
+      return templateFrame.channels[channelIndex] ?? null;
+    }
+    const channel = song.channels[channelIndex];
+    return channel?.patterns[0]?.id ?? null;
+  });
+
+  frames.splice(insertIndex, 0, { channels });
 }
