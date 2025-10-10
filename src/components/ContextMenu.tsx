@@ -37,26 +37,20 @@ export function createContextMenuController<T>(): ContextMenuController<T> {
     close,
   };
 }
-const OFFSET = 4;
 
 export function ContextMenu(props: ContextMenuProps) {
   let menuRef: HTMLDivElement | undefined;
 
   createEffect(() => {
-    const position = props.anchor();
     if (!menuRef) {
       return;
     }
 
+    const position = props.anchor();
+
     if (position) {
-      const pointerX = position.x + OFFSET;
-      const pointerY = position.y + OFFSET;
-      setMenuPosition(menuRef, pointerX, pointerY);
+      setMenuPosition(menuRef, position.x, position.y);
       menuRef.showPopover();
-      requestAnimationFrame(() => {
-        const { x, y } = clampToViewport(menuRef, pointerX, pointerY);
-        setMenuPosition(menuRef, x, y);
-      });
     } else {
       menuRef.hidePopover();
     }
@@ -106,18 +100,6 @@ export function ContextMenu(props: ContextMenuProps) {
 }
 
 function setMenuPosition(menu: HTMLDivElement, x: number, y: number) {
-  menu.style.left = `${x}px`;
-  menu.style.top = `${y}px`;
-}
-
-function clampToViewport(menu: HTMLDivElement, x: number, y: number) {
-  const width = menu.offsetWidth;
-  const height = menu.offsetHeight;
-  const maxX = Math.max(OFFSET, window.innerWidth - width - OFFSET);
-  const maxY = Math.max(OFFSET, window.innerHeight - height - OFFSET);
-
-  return {
-    x: Math.min(Math.max(x, OFFSET), maxX),
-    y: Math.min(Math.max(y, OFFSET), maxY),
-  };
+  menu.style.setProperty('--context-menu-anchor-x', `${x}px`);
+  menu.style.setProperty('--context-menu-anchor-y', `${y}px`);
 }

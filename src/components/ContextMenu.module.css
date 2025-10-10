@@ -1,20 +1,60 @@
 .menu {
   position: fixed;
+  --context-menu-viewport-offset: 8px;
+  --context-menu-pointer-offset-x: 8px;
+  --context-menu-pointer-offset-y: 8px;
+  --context-menu-anchor-x: 0px;
+  --context-menu-anchor-y: 0px;
+
   min-width: 120px;
   padding: 4px 0;
   background-color: rgba(32, 32, 32, 0.95);
   color: #fff;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 4px;
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.08),
-    0 8px 24px rgba(0, 0, 0, 0.45),
-    0 0 18px rgba(0, 174, 255, 0.35);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 8px 24px rgba(0, 0, 0, 0.45), 0 0 18px rgba(0, 174, 255, 0.35);
   font-size: 0.85rem;
   display: none;
   margin: 0;
   inset: auto;
   width: max-content;
+  left: var(--context-menu-anchor-x);
+  top: var(--context-menu-anchor-y);
+
+  transform: translate(
+    calc(
+      var(--context-menu-pointer-offset-x) +
+        max(
+          0px,
+          calc(
+            var(--context-menu-viewport-offset) - var(--context-menu-anchor-x) - var(--context-menu-pointer-offset-x)
+          )
+        ) +
+        min(
+          0px,
+          calc(
+            100vw - var(--context-menu-viewport-offset) - var(--context-menu-anchor-x) - 100% -
+              var(--context-menu-pointer-offset-x)
+          )
+        )
+    ),
+    calc(
+      var(--context-menu-pointer-offset-y) +
+        max(
+          0px,
+          calc(
+            var(--context-menu-viewport-offset) - var(--context-menu-anchor-y) - var(--context-menu-pointer-offset-y)
+          )
+        ) +
+        min(
+          0px,
+          calc(
+            100vh - var(--context-menu-viewport-offset) - var(--context-menu-anchor-y) - 100% -
+              var(--context-menu-pointer-offset-y)
+          )
+        )
+    )
+  );
 }
 
 .menu:popover-open {
