@@ -25,8 +25,7 @@ export function FrameEditor(props: FrameEditorProps) {
     <div class={styles.frameEditor}>
       <Index each={props.frame.channels}>
         {(patternIdAccessor, channelIndex) => {
-          const channelPatterns = props.channels[channelIndex]?.patterns ?? [];
-          const resolvedPattern = () => resolvePattern(channelPatterns, patternIdAccessor());
+          const resolvedPattern = () => resolvePattern(props.channels[channelIndex].patterns, patternIdAccessor());
 
           return (
             <div class={styles.channelColumn}>
