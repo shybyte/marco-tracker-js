@@ -2,7 +2,7 @@ import { For } from 'solid-js';
 import type { Song } from './song';
 import styles from './PatternMatrix.module.css';
 import { maxBy } from './utils/utils';
-import { ContextMenu, createContextMenuController } from './components/ContextMenu';
+import { ContextMenu, ContextMenuItem, createContextMenuController } from './components/ContextMenu';
 
 interface PatternMatrixProps {
   frames: Song['frames'];
@@ -30,22 +30,17 @@ export function PatternMatrix(props: PatternMatrixProps) {
   const handleAddRow = () => {
     const targetIndex = contextMenu.data();
     const insertIndex = targetIndex == null ? props.frames.length : targetIndex + 1;
-    contextMenu.close();
     props.onInsertFrame(insertIndex);
   };
 
   const handleDeleteRow = () => {
     const targetIndex = contextMenu.data();
-    if (targetIndex == null) {
-      contextMenu.close();
-      return;
+    if (targetIndex !== null && targetIndex !== undefined) {
+      props.onDeleteFrame(targetIndex);
     }
-    contextMenu.close();
-    props.onDeleteFrame(targetIndex);
   };
 
   const handleAddChannel = () => {
-    contextMenu.close();
     props.onAddChannel();
   };
 
@@ -109,17 +104,9 @@ export function PatternMatrix(props: PatternMatrixProps) {
         </tbody>
       </table>
       <ContextMenu anchor={contextMenu.anchor} onClose={contextMenu.close}>
-        <button type="button" onClick={handleAddChannel} role="menuitem">
-          Add Channel
-        </button>
-        <button type="button" onClick={handleAddRow} role="menuitem">
-          Add Row Below
-        </button>
-        {contextMenu.data() != null && (
-          <button type="button" onClick={handleDeleteRow} role="menuitem">
-            Delete Row
-          </button>
-        )}
+        <ContextMenuItem onClick={handleAddChannel}>Add Channel</ContextMenuItem>
+        <ContextMenuItem onClick={handleAddRow}>Add Row Below</ContextMenuItem>
+        {contextMenu.data() != null && <ContextMenuItem onClick={handleDeleteRow}>Delete Row</ContextMenuItem>}
       </ContextMenu>
     </div>
   );

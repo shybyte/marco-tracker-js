@@ -1,9 +1,14 @@
-import { Accessor, JSX, createEffect, createSignal, onCleanup } from 'solid-js';
+import { Accessor, JSX, createContext, createEffect, createSignal, onCleanup, useContext } from 'solid-js';
 import styles from './ContextMenu.module.css';
 
 interface ContextMenuProps {
   anchor: Accessor<{ x: number; y: number } | null>;
   onClose: () => void;
+  children: JSX.Element;
+}
+
+interface ContextMenuItemProps {
+  onClick: () => void;
   children: JSX.Element;
 }
 
@@ -13,6 +18,8 @@ export interface ContextMenuController<T> {
   open: (event: MouseEvent, payload: T) => void;
   close: () => void;
 }
+
+const ContextMenuContext = createContext<{ close: () => void }>();
 
 export function createContextMenuController<T>(): ContextMenuController<T> {
   const [anchor, setAnchor] = createSignal<{ x: number; y: number } | null>(null);
@@ -85,17 +92,40 @@ export function ContextMenu(props: ContextMenuProps) {
   });
 
   return (
-    <div
-      ref={menuRef}
-      class={styles.menu}
-      role="menu"
-      popover="manual"
-      onClick={(event) => {
-        event.stopPropagation();
+    <ContextMenuContext.Provider value={{ close: props.onClose }}>
+      <div
+        ref={menuRef}
+        class={styles.menu}
+        role="menu"
+        popover="manual"
+        onClick={(event) => {
+          event.stopPropagation();
+        }}
+      >
+        {props.children}
+      </div>
+    </ContextMenuContext.Provider>
+  );
+}
+
+export function ContextMenuItem(props: ContextMenuItemProps) {
+  const contextMenuContext = useContext(ContextMenuContext);
+
+  if (!contextMenuContext) {
+    throw new Error('ContextMenuItem must be used within a ContextMenu');
+  }
+
+  return (
+    <button
+      type="button"
+      role="menuitem"
+      onClick={() => {
+        props.onClick();
+        contextMenuContext.close();
       }}
     >
       {props.children}
-    </div>
+    </button>
   );
 }
 
