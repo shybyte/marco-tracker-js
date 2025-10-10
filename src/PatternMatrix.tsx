@@ -5,14 +5,14 @@ import { maxBy } from './utils/utils';
 
 interface PatternMatrixProps {
   frames: Song['frames'];
-  patterns: Song['patterns'];
+  channels: Song['channels'];
   selectedFrame: number;
   onSelectFrame: (index: number) => void;
   onAssignChannel: (frameIndex: number, channelIndex: number, patternId: string | null) => void;
 }
 
 export function PatternMatrix(props: PatternMatrixProps) {
-  const maxChannels = () => maxBy(props.frames, (frame) => frame.channels.length);
+  const maxChannels = () => Math.max(props.channels.length, maxBy(props.frames, (frame) => frame.channels.length));
 
   return (
     <div class={styles.patternMatrix}>
@@ -51,7 +51,7 @@ export function PatternMatrix(props: PatternMatrixProps) {
                           }}
                         >
                           <option value="">--</option>
-                          <For each={props.patterns}>
+                          <For each={props.channels[channelIndex()]?.patterns ?? []}>
                             {(pattern) => <option value={pattern.id}>{pattern.id}</option>}
                           </For>
                         </select>

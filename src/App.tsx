@@ -20,7 +20,8 @@ import { PatternMatrix } from './PatternMatrix';
 import { FrameEditor } from './FrameEditor';
 
 const App: Component = () => {
-  const song = createMutable<Song>(normalizeSong({ ...createEmptySong(), ...loadSong() }));
+  const storedSong = loadSong();
+  const song = createMutable<Song>(normalizeSong(storedSong ?? createEmptySong()));
   const [playPos, setPlayPos] = createSignal(-1);
   const [midiOutputs, setMidiOutputs] = createSignal<MidiOutputInfo[]>([]);
   const [selectedOutput, setSelectedOutput] = createSignal<string>(
@@ -41,7 +42,12 @@ const App: Component = () => {
         return;
       }
 
-      const pattern = song.patterns.find((candidatePattern) => candidatePattern.id === patternId);
+      const channel = song.channels[channelIndex];
+      if (!channel) {
+        return;
+      }
+
+      const pattern = channel.patterns.find((candidatePattern) => candidatePattern.id === patternId);
       if (!pattern) {
         return;
       }
@@ -173,7 +179,7 @@ const App: Component = () => {
         <div class={styles.editorLayout}>
           <PatternMatrix
             frames={song.frames}
-            patterns={song.patterns}
+            channels={song.channels}
             selectedFrame={selectedFrameIndex()}
             onSelectFrame={(index) => setSelectedFrameIndex(index)}
             onAssignChannel={(frameIndex, channelIndex, patternId) => {
@@ -188,7 +194,7 @@ const App: Component = () => {
             {(frame) => (
               <FrameEditor
                 frame={frame()}
-                patterns={song.patterns}
+                channels={song.channels}
                 patternLength={song.patternLength}
                 playPos={playPos()}
                 setPlayPos={setPlayPos}
