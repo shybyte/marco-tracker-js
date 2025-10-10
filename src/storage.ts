@@ -1,13 +1,17 @@
-import { Song } from './song';
+import { normalizeSong, Song } from './song';
 
 export function loadSong(): Song | undefined {
   const storedString = localStorage.getItem('marcotracker.song');
-
   if (!storedString) {
     return undefined;
   }
 
-  return JSON.parse(storedString) as Song;
+  try {
+    return normalizeSong(JSON.parse(storedString) as Song);
+  } catch (error) {
+    console.error('Failed to load song', error);
+    return undefined;
+  }
 }
 
 export function saveSong(song: Song) {

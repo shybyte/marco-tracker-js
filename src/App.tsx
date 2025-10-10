@@ -2,6 +2,7 @@ import { For, Show, createEffect, createSignal, onCleanup, onMount, type Compone
 import { createMutable } from 'solid-js/store';
 import styles from './App.module.css';
 import { NumberInput } from './components/NumberInput';
+import { FrameEditor } from './FrameEditor';
 import {
   getPlaybackMode,
   getSelectedMidiOutputId,
@@ -12,16 +13,15 @@ import {
   subscribeMidiOutputs,
   type MidiOutputInfo,
 } from './instruments';
-import { Song, createEmptySong, normalizeSong, createPatternForChannel, insertFrame, deleteFrame } from './song';
+import { PatternMatrix } from './PatternMatrix';
+import { Song, createEmptySong, createPatternForChannel, deleteFrame, insertFrame } from './song';
 import { loadSong, saveSong } from './storage';
 import { AccurateInterval } from './utils/interval';
 import { getStepTimeInSecondsForBmp } from './utils/utils';
-import { PatternMatrix } from './PatternMatrix';
-import { FrameEditor } from './FrameEditor';
 
 const App: Component = () => {
   const storedSong = loadSong();
-  const song = createMutable<Song>(normalizeSong(storedSong ?? createEmptySong()));
+  const song = createMutable<Song>(storedSong ?? createEmptySong());
   const [playPos, setPlayPos] = createSignal(-1);
   const [midiOutputs, setMidiOutputs] = createSignal<MidiOutputInfo[]>([]);
   const [selectedOutput, setSelectedOutput] = createSignal<string>(
@@ -143,7 +143,17 @@ const App: Component = () => {
       <header class={styles.header}>MarcoTracker</header>
       <main class={styles.main}>
         <div role="toolbar">
-          <button onClick={() => Object.assign(song, loadSong())}>Load</button>
+          <button
+            onClick={() => {
+              const loadedSong = loadSong();
+
+              if (loadedSong) {
+                Object.assign(song, loadedSong);
+              }
+            }}
+          >
+            Load
+          </button>
           <button onClick={() => saveSong(song)}>Save</button>
           <button onClick={startPlay}>Play</button>
           <button onClick={stopPlay}>Stop</button>

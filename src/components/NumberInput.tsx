@@ -15,7 +15,7 @@ export function NumberInput(props: NumberInputProps) {
         placeholder={props.label}
         value={props.value}
         onInput={(e) => {
-          if (e.currentTarget.valueAsNumber) {
+          if (!Number.isNaN(e.currentTarget.valueAsNumber)) {
             props.setValue(e.currentTarget.valueAsNumber);
           }
         }}
