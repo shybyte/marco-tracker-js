@@ -8,6 +8,8 @@ This Agents.md file provides comprehensive guidance for OpenAI Codex and other A
 
 ## Coding Conventions for OpenAI Codex
 
+- Prefer named functions
+
 ## Testing Requirements for OpenAI Codex
 
 OpenAI Codex should verify whether the code compiles via:

@@ -7,11 +7,6 @@ interface ContextMenuProps {
   children: JSX.Element;
 }
 
-type PopoverElement = HTMLDivElement & {
-  showPopover: () => void;
-  hidePopover: () => void;
-};
-
 export interface ContextMenuController<T> {
   anchor: Accessor<{ x: number; y: number } | null>;
   data: Accessor<T | undefined>;
@@ -42,39 +37,32 @@ export function createContextMenuController<T>(): ContextMenuController<T> {
     close,
   };
 }
+const OFFSET = 4;
 
 export function ContextMenu(props: ContextMenuProps) {
-  let menuRef: PopoverElement | undefined;
+  let menuRef: HTMLDivElement | undefined;
 
   createEffect(() => {
     const position = props.anchor();
-    const menu = menuRef;
-    if (!menu) {
+    if (!menuRef) {
       return;
     }
 
     if (position) {
-      const pointerX = position.x + 4;
-      const pointerY = position.y + 4;
-      menu.style.left = `${pointerX}px`;
-      menu.style.top = `${pointerY}px`;
-      menu.showPopover();
+      const pointerX = position.x + OFFSET;
+      const pointerY = position.y + OFFSET;
+      setMenuPosition(menuRef, pointerX, pointerY);
+      menuRef.showPopover();
       requestAnimationFrame(() => {
         if (!menuRef || !menuRef.matches(':popover-open')) {
           return;
         }
-        const width = menuRef.offsetWidth;
-        const height = menuRef.offsetHeight;
-        const maxX = Math.max(0, window.innerWidth - width - 4);
-        const maxY = Math.max(0, window.innerHeight - height - 4);
-        const clampedX = Math.min(Math.max(pointerX, 4), maxX);
-        const clampedY = Math.min(Math.max(pointerY, 4), maxY);
-        menuRef.style.left = `${clampedX}px`;
-        menuRef.style.top = `${clampedY}px`;
+        const { x, y } = clampToViewport(menuRef, pointerX, pointerY);
+        setMenuPosition(menuRef, x, y);
       });
     } else {
-      if (menu.matches(':popover-open')) {
-        menu.hidePopover();
+      if (menuRef.matches(':popover-open')) {
+        menuRef.hidePopover();
       }
     }
   });
@@ -121,4 +109,21 @@ export function ContextMenu(props: ContextMenuProps) {
       {props.children}
     </div>
   );
+}
+
+function setMenuPosition(menu: HTMLDivElement, x: number, y: number) {
+  menu.style.left = `${x}px`;
+  menu.style.top = `${y}px`;
+}
+
+function clampToViewport(menu: HTMLDivElement, x: number, y: number) {
+  const width = menu.offsetWidth;
+  const height = menu.offsetHeight;
+  const maxX = Math.max(OFFSET, window.innerWidth - width - OFFSET);
+  const maxY = Math.max(OFFSET, window.innerHeight - height - OFFSET);
+
+  return {
+    x: Math.min(Math.max(x, OFFSET), maxX),
+    y: Math.min(Math.max(y, OFFSET), maxY),
+  };
 }
