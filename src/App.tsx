@@ -124,16 +124,18 @@ const App: Component = () => {
     setSelectedFrameIndex(insertIndex);
   }
 
-  function handleDeleteFrame(frameIndex: number) {
+  function handleDeleteFrame(frameIndexToDelete: number) {
     const previousSelection = selectedFrameIndex();
-    deleteFrame(song, frameIndex);
 
-    if (song.frames.length > 0) {
-      const nextSelection = previousSelection > frameIndex ? previousSelection - 1 : previousSelection;
-      setSelectedFrameIndex(Math.min(nextSelection, song.frames.length - 1));
-    } else {
+    deleteFrame(song, frameIndexToDelete);
+
+    if (song.frames.length == 0) {
       setSelectedFrameIndex(0);
+      return;
     }
+
+    const nextSelection = previousSelection > frameIndexToDelete ? previousSelection - 1 : previousSelection;
+    setSelectedFrameIndex(Math.min(nextSelection, song.frames.length - 1));
   }
 
   return (
