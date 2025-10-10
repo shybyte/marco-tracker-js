@@ -128,6 +128,17 @@ export function createPatternForChannel(song: Song, channelIndex: number): Patte
   return pattern.id;
 }
 
+export function addChannel(song: Song): number {
+  const newChannelIndex = song.channels.length;
+  song.channels.push({ patterns: [] });
+
+  song.frames.forEach((frame) => {
+    frame.channels.push(null);
+  });
+
+  return newChannelIndex;
+}
+
 export function insertFrame(song: Song, insertIndex: number): void {
   const frames = song.frames;
   const channelCount = Math.max(
