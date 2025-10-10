@@ -9,10 +9,17 @@ interface PatternMatrixProps {
   selectedFrame: number;
   onSelectFrame: (index: number) => void;
   onAssignChannel: (frameIndex: number, channelIndex: number, patternId: string | null) => void;
+  onCreatePattern: (channelIndex: number) => string;
 }
 
+const NEW_PATTERN_VALUE = '__new_pattern__';
+
 export function PatternMatrix(props: PatternMatrixProps) {
-  const maxChannels = () => Math.max(props.channels.length, maxBy(props.frames, (frame) => frame.channels.length));
+  const maxChannels = () =>
+    Math.max(
+      props.channels.length,
+      maxBy(props.frames, (frame) => frame.channels.length)
+    );
 
   return (
     <div class={styles.patternMatrix}>
@@ -46,11 +53,19 @@ export function PatternMatrix(props: PatternMatrixProps) {
                           onMouseDown={(event) => event.stopPropagation()}
                           onChange={(event) => {
                             const value = event.currentTarget.value;
-                            const nextPatternId = value || null;
-                            props.onAssignChannel(index(), channelIndex(), nextPatternId);
+                            if (value === NEW_PATTERN_VALUE) {
+                              const createdPatternId = props.onCreatePattern(channelIndex());
+                              props.onAssignChannel(index(), channelIndex(), createdPatternId);
+                              event.currentTarget.value = createdPatternId;
+                              return;
+                            } else {
+                              const nextPatternId = value || null;
+                              props.onAssignChannel(index(), channelIndex(), nextPatternId);
+                            }
                           }}
                         >
                           <option value="">--</option>
+                          <option value={NEW_PATTERN_VALUE}>New Pattern</option>
                           <For each={props.channels[channelIndex()]?.patterns ?? []}>
                             {(pattern) => <option value={pattern.id}>{pattern.id}</option>}
                           </For>

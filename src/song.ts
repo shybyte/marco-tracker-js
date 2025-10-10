@@ -109,3 +109,24 @@ export function normalizeSong(song: Song): Song {
 
   return song;
 }
+
+export function createPatternForChannel(song: Song, channelIndex: number): PatternID {
+  const channel = song.channels[channelIndex];
+  if (!channel) {
+    throw new Error(`Channel ${channelIndex} does not exist.`);
+  }
+
+  const existingIds = new Set(channel.patterns.map((pattern) => pattern.id));
+  let counter = channel.patterns.length;
+  let candidateId = String(counter);
+
+  while (existingIds.has(candidateId)) {
+    counter += 1;
+    candidateId = String(counter);
+  }
+
+  const pattern = createEmptyPattern(candidateId, song.patternLength);
+  channel.patterns.push(pattern);
+
+  return pattern.id;
+}

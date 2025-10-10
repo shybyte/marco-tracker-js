@@ -12,7 +12,7 @@ import {
   subscribeMidiOutputs,
   type MidiOutputInfo,
 } from './instruments';
-import { Song, createEmptySong, normalizeSong } from './song';
+import { Song, createEmptySong, normalizeSong, createPatternForChannel } from './song';
 import { loadSong, saveSong } from './storage';
 import { AccurateInterval } from './utils/interval';
 import { getStepTimeInSecondsForBmp } from './utils/utils';
@@ -182,6 +182,7 @@ const App: Component = () => {
             channels={song.channels}
             selectedFrame={selectedFrameIndex()}
             onSelectFrame={(index) => setSelectedFrameIndex(index)}
+            onCreatePattern={(channelIndex) => createPatternForChannel(song, channelIndex)}
             onAssignChannel={(frameIndex, channelIndex, patternId) => {
               const frame = song.frames[frameIndex];
               if (!frame) {
