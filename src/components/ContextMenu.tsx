@@ -54,16 +54,11 @@ export function ContextMenu(props: ContextMenuProps) {
       setMenuPosition(menuRef, pointerX, pointerY);
       menuRef.showPopover();
       requestAnimationFrame(() => {
-        if (!menuRef || !menuRef.matches(':popover-open')) {
-          return;
-        }
         const { x, y } = clampToViewport(menuRef, pointerX, pointerY);
         setMenuPosition(menuRef, x, y);
       });
     } else {
-      if (menuRef.matches(':popover-open')) {
-        menuRef.hidePopover();
-      }
+      menuRef.hidePopover();
     }
   });
 
@@ -73,8 +68,7 @@ export function ContextMenu(props: ContextMenuProps) {
     }
 
     function handlePointerDown(event: PointerEvent) {
-      const menu = menuRef;
-      if (menu && !menu.contains(event.target as Node)) {
+      if (menuRef && !menuRef.contains(event.target as Node)) {
         props.onClose();
       }
     }
