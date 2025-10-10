@@ -12,6 +12,7 @@ interface PatternMatrixProps {
   onAssignChannel: (frameIndex: number, channelIndex: number, patternId: string | null) => void;
   onCreatePattern: (channelIndex: number) => string;
   onInsertFrame: (insertIndex: number) => void;
+  onDeleteFrame: (frameIndex: number) => void;
 }
 
 const NEW_PATTERN_VALUE = '__new_pattern__';
@@ -30,6 +31,16 @@ export function PatternMatrix(props: PatternMatrixProps) {
     const insertIndex = targetIndex == null ? props.frames.length : targetIndex + 1;
     contextMenu.close();
     props.onInsertFrame(insertIndex);
+  };
+
+  const handleDeleteRow = () => {
+    const targetIndex = contextMenu.data();
+    if (targetIndex == null) {
+      contextMenu.close();
+      return;
+    }
+    contextMenu.close();
+    props.onDeleteFrame(targetIndex);
   };
 
   return (
@@ -95,6 +106,11 @@ export function PatternMatrix(props: PatternMatrixProps) {
         <button type="button" onClick={handleAddRow} role="menuitem">
           Add Row Below
         </button>
+        {contextMenu.data() != null && (
+          <button type="button" onClick={handleDeleteRow} role="menuitem">
+            Delete Row
+          </button>
+        )}
       </ContextMenu>
     </div>
   );

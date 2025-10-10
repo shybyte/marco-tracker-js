@@ -130,7 +130,10 @@ export function createPatternForChannel(song: Song, channelIndex: number): Patte
 
 export function insertFrame(song: Song, insertIndex: number): void {
   const frames = song.frames;
-  const channelCount = Math.max(song.channels.length, maxBy(frames, (frame) => frame.channels.length));
+  const channelCount = Math.max(
+    song.channels.length,
+    maxBy(frames, (frame) => frame.channels.length)
+  );
 
   const templateFrame = frames[insertIndex - 1] ?? frames[insertIndex];
 
@@ -143,4 +146,12 @@ export function insertFrame(song: Song, insertIndex: number): void {
   });
 
   frames.splice(insertIndex, 0, { channels });
+}
+
+export function deleteFrame(song: Song, frameIndex: number): void {
+  if (frameIndex < 0 || frameIndex >= song.frames.length) {
+    throw new Error(`Invalid frameIndex ${frameIndex}`);
+  }
+
+  song.frames.splice(frameIndex, 1);
 }

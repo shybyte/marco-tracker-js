@@ -12,7 +12,7 @@ import {
   subscribeMidiOutputs,
   type MidiOutputInfo,
 } from './instruments';
-import { Song, createEmptySong, normalizeSong, createPatternForChannel, insertFrame } from './song';
+import { Song, createEmptySong, normalizeSong, createPatternForChannel, insertFrame, deleteFrame } from './song';
 import { loadSong, saveSong } from './storage';
 import { AccurateInterval } from './utils/interval';
 import { getStepTimeInSecondsForBmp } from './utils/utils';
@@ -124,6 +124,18 @@ const App: Component = () => {
     setSelectedFrameIndex(insertIndex);
   }
 
+  function handleDeleteFrame(frameIndex: number) {
+    const previousSelection = selectedFrameIndex();
+    deleteFrame(song, frameIndex);
+
+    if (song.frames.length > 0) {
+      const nextSelection = previousSelection > frameIndex ? previousSelection - 1 : previousSelection;
+      setSelectedFrameIndex(Math.min(nextSelection, song.frames.length - 1));
+    } else {
+      setSelectedFrameIndex(0);
+    }
+  }
+
   return (
     <div class={styles.App}>
       <header class={styles.header}>MarcoTracker</header>
@@ -196,6 +208,7 @@ const App: Component = () => {
               frame.channels[channelIndex] = patternId;
             }}
             onInsertFrame={handleInsertFrame}
+            onDeleteFrame={handleDeleteFrame}
           />
           <Show when={currentFrame()} fallback={<div class={styles.framePlaceholder}>No frame selected</div>}>
             {(frame) => (
