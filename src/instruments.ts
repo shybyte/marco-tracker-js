@@ -1,4 +1,4 @@
-import { getSoundfontNames, Soundfont, SoundfontOptions } from 'smplr';
+import { Soundfont, SoundfontOptions } from 'smplr';
 import { Note } from './song';
 import {
   getMidiOutputsSnapshot,
@@ -26,9 +26,7 @@ class InstrumentPlayer {
   private soundFountByName = new Map<string, Soundfont>();
 
   constructor() {
-    const soundfontNames = getSoundfontNames();
-    console.log('soundfontNames', soundfontNames);
-
+    // console.log('soundfontNames', getSoundfontNames());
     this.getSoundFont(LOCAL_INSTRUMENTS[0]);
   }
 
