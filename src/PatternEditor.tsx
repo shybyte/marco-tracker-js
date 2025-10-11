@@ -1,46 +1,46 @@
-import { Accessor, Index, Setter, Show, createSignal } from 'solid-js';
-import cssClasses from './PatternEditor.module.css';
+import { type Accessor, createSignal, Index, type Setter, Show } from 'solid-js';
 import { playNote } from './instruments';
+import type { MidiCannel } from './midi-output';
 import {
-  A0,
   A_1,
-  B0,
+  A0,
   B_1,
+  B0,
+  C_1,
   C0,
   C1,
   C3,
   C4,
-  C_1,
+  Cis_1,
   Cis0,
   Cis1,
-  Cis_1,
+  D_1,
   D0,
   D1,
-  D_1,
+  Dis_1,
   Dis0,
   Dis1,
-  Dis_1,
+  E_1,
   E0,
   E1,
-  E_1,
+  F_1,
   F0,
   F1,
-  F_1,
+  Fis_1,
   Fis0,
   Fis1,
-  Fis_1,
+  G_1,
   G0,
   G1,
-  G_1,
-  Gis0,
   Gis_1,
-  H0,
-  H_1,
+  Gis0,
   getMidiNoteName,
+  H_1,
+  H0,
 } from './notes';
-import { Note, Pattern, PatternStep, createEmptyPatternStep } from './song';
+import cssClasses from './PatternEditor.module.css';
+import { createEmptyPatternStep, type Note, type Pattern, type PatternStep } from './song';
 import { ensureArrayLength, focusElement, range } from './utils/utils';
-import { MidiCannel } from './midi-output';
 
 const notes = range(C3, C4);
 type NoteDisplayMode = 'PianoRoll' | 'Tracker';

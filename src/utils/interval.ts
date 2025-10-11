@@ -3,16 +3,13 @@ export class AccurateInterval {
   private nextTime = 0;
   private running = false;
 
-  constructor(
-    public intervalSeconds: number,
-    private readonly callback: () => void,
-  ) {}
+  constructor(public intervalSeconds: number, private readonly callback: () => void) {}
 
   start(): void {
     if (this.running) return;
 
     if (!this.audioContext) {
-      this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      this.audioContext = new window.AudioContext();
     }
 
     this.nextTime = this.audioContext.currentTime;
@@ -27,6 +24,7 @@ export class AccurateInterval {
   private tick = () => {
     if (!this.running) return;
 
+    // biome-ignore lint/style/noNonNullAssertion: is set in start
     const currentTime = this.audioContext!.currentTime;
     if (currentTime >= this.nextTime) {
       this.callback();

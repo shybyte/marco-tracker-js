@@ -24,7 +24,7 @@ let selectedMidiOutputId: string | null = null;
 
 function notifyMidiOutputListeners() {
   const snapshot = midiOutputInfos.map((info) => ({ ...info }));
-  midiOutputsListeners.forEach((listener) => listener(snapshot));
+  midiOutputsListeners.forEach((listener) => void listener(snapshot));
 }
 
 function updateMidiOutputs(access: MIDIAccess) {
@@ -61,7 +61,7 @@ function initMidi() {
 
   midiInitPromise = (async () => {
     try {
-      const access = await navigatorWithMidi.requestMIDIAccess!();
+      const access = await navigatorWithMidi.requestMIDIAccess();
       updateMidiOutputs(access);
       access.onstatechange = () => updateMidiOutputs(access);
     } catch (error) {

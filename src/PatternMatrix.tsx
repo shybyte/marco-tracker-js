@@ -1,7 +1,7 @@
 import { For } from 'solid-js';
-import type { Song } from './song';
-import styles from './PatternMatrix.module.css';
 import { ContextMenu, ContextMenuItem, createContextMenuController } from './components/ContextMenu';
+import styles from './PatternMatrix.module.css';
+import type { Song } from './song';
 
 interface PatternMatrixProps {
   frames: Song['frames'];
@@ -99,7 +99,7 @@ export function PatternMatrix(props: PatternMatrixProps) {
         {() => {
           const payload = contextMenu.data();
           if (!payload) {
-            return <></>;
+            return;
           }
 
           return (

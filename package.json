@@ -1,5 +1,5 @@
 {
-  "name": "vite-template-solid",
+  "name": "marco-tracker-js",
   "version": "0.0.0",
   "type": "module",
   "description": "",
@@ -9,10 +9,12 @@
     "build": "vite build",
     "serve": "vite preview",
     "download-instruments": "node tools/download-instruments.js",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "biome lint src"
   },
   "license": "MIT",
   "devDependencies": {
+    "@biomejs/biome": "2.2.5",
     "solid-devtools": "^0.34.3",
     "typescript": "^5.9.3",
     "vite": "^7.1.8",

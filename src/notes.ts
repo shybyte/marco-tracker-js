@@ -1,4 +1,4 @@
-import { Note } from './song';
+import type { Note } from './song';
 
 export const C_1 = 0;
 export const Cis_1 = 1;

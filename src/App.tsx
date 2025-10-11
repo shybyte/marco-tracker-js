@@ -1,4 +1,4 @@
-import { For, Show, createEffect, createSignal, onCleanup, onMount, type Component } from 'solid-js';
+import { type Component, createEffect, createSignal, For, onCleanup, onMount, Show } from 'solid-js';
 import { createMutable } from 'solid-js/store';
 import styles from './App.module.css';
 import { NumberInput } from './components/NumberInput';
@@ -6,26 +6,26 @@ import { FrameEditor } from './FrameEditor';
 import {
   getPlaybackMode,
   getSelectedMidiOutputId,
+  type MidiOutputInfo,
   playNote,
   refreshMidiOutputs,
   setPlaybackMode,
   setSelectedMidiOutput,
   subscribeMidiOutputs,
-  type MidiOutputInfo,
 } from './instruments';
 import { PatternMatrix } from './PatternMatrix';
 import {
-  Song,
   addChannel,
   createEmptySong,
   createPatternForChannel,
   deleteFrame,
   insertFrame,
   removeChannel,
+  type Song,
 } from './song';
 import { loadSong, saveSong } from './storage';
 import { AccurateInterval } from './utils/interval';
-import { getStepTimeInSecondsForBmp } from './utils/utils';
+import { getStepTimeInSecondsForBmp, setter } from './utils/utils';
 
 const App: Component = () => {
   const storedSong = loadSong();
@@ -137,7 +137,7 @@ const App: Component = () => {
 
     deleteFrame(song, frameIndexToDelete);
 
-    if (song.frames.length == 0) {
+    if (song.frames.length === 0) {
       setSelectedFrameIndex(0);
       return;
     }
@@ -166,20 +166,15 @@ const App: Component = () => {
           <button onClick={startPlay}>Play</button>
           <button onClick={stopPlay}>Stop</button>
 
-          <NumberInput value={song.tempo} label="BPM" width={3} setValue={(value) => (song.tempo = value)} />
+          <NumberInput value={song.tempo} label="BPM" width={3} setValue={setter(song, 'tempo')} />
 
-          <NumberInput
-            value={song.stepsPerBeat}
-            label="BeatSize"
-            width={2}
-            setValue={(value) => (song.stepsPerBeat = value)}
-          />
+          <NumberInput value={song.stepsPerBeat} label="BeatSize" width={2} setValue={setter(song, 'stepsPerBeat')} />
 
           <NumberInput
             value={song.patternLength}
             label="PatternLength"
             width={3}
-            setValue={(value) => (song.patternLength = value)}
+            setValue={setter(song, 'patternLength')}
           />
 
           <label>

@@ -1,7 +1,7 @@
-import { Index, Setter, Show } from 'solid-js';
+import { Index, type Setter, Show } from 'solid-js';
+import styles from './FrameEditor.module.css';
 import { PatternEditor } from './PatternEditor';
 import type { Pattern, PatternID, Song } from './song';
-import styles from './FrameEditor.module.css';
 
 interface FrameEditorProps {
   frame: Song['frames'][number];

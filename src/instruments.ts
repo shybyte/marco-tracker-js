@@ -1,15 +1,15 @@
-import { Soundfont, SoundfontOptions } from 'smplr';
-import { Note } from './song';
+import { Soundfont, type SoundfontOptions } from 'smplr';
 import {
   getMidiOutputsSnapshot,
   getSelectedMidiOutputId,
-  MidiCannel,
+  type MidiCannel,
+  type MidiOutputInfo,
   playMidiNote,
   refreshMidiOutputs,
   setSelectedMidiOutput,
   subscribeMidiOutputs,
-  type MidiOutputInfo,
 } from './midi-output';
+import type { Note } from './song';
 
 export { getSelectedMidiOutputId, refreshMidiOutputs, setSelectedMidiOutput, subscribeMidiOutputs };
 export type { MidiOutputInfo };

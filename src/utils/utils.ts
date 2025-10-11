@@ -11,9 +11,7 @@ export function range(start: number, end: number): number[] {
 }
 
 export function focusElement(e: HTMLDivElement) {
-  setTimeout(function () {
-    e.focus();
-  });
+  setTimeout(() => e.focus());
 }
 
 export function getStepTimeInSecondsForBmp(bpm: number, stepsPerBeat: number) {

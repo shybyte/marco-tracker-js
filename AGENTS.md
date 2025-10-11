@@ -8,7 +8,7 @@ This Agents.md file provides comprehensive guidance for OpenAI Codex and other A
 
 ## Coding Conventions for OpenAI Codex
 
-- Prefer named functions
+- Prefer named functions over assigning an arrow function directly to a const variable
 
 ## Testing Requirements for OpenAI Codex
 

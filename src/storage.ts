@@ -1,4 +1,4 @@
-import { normalizeSong, Song } from './song';
+import { normalizeSong, type Song } from './song';
 
 export function loadSong(): Song | undefined {
   const storedString = localStorage.getItem('marcotracker.song');

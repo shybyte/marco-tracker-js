@@ -20,6 +20,15 @@
         "clear": true
       },
       "problemMatcher": []
+    },
+    {
+      "label": "lint",
+      "type": "shell",
+      "command": "bun run lint",
+      "presentation": {
+        "clear": true
+      },
+      "problemMatcher": []
     }
   ]
 }

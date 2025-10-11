@@ -1,4 +1,4 @@
-import { Accessor, JSX, createContext, createEffect, createSignal, onCleanup, useContext } from 'solid-js';
+import { type Accessor, createContext, createEffect, createSignal, type JSX, onCleanup, useContext } from 'solid-js';
 import styles from './ContextMenu.module.css';
 
 export interface ContextMenuController<T> {
