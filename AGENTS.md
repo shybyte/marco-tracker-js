@@ -10,10 +10,16 @@ This Agents.md file provides comprehensive guidance for OpenAI Codex and other A
 
 - Prefer named functions over assigning an arrow function directly to a const variable
 
-## Testing Requirements for OpenAI Codex
+## Typechecking and Linting for OpenAI Codex
 
 OpenAI Codex should verify whether the code compiles via:
 
 ```bash
 bun run typecheck
+```
+
+OpenAI Codex should verify whether the code is linted correctly via:
+
+```bash
+bun run lint
 ```
