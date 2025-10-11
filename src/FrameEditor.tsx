@@ -1,8 +1,14 @@
-import { For, Index, type Setter, Show } from 'solid-js';
+import { createSignal, For, Index, type Setter, Show } from 'solid-js';
+import { ChannelConfigDialog } from './components/ChannelConfigDialog';
+import { ContextMenu, ContextMenuItem, createContextMenuController } from './components/ContextMenu';
 import styles from './FrameEditor.module.css';
 import { PatternEditor } from './PatternEditor';
-import { createDefaultChannelNotes, type Pattern, type PatternID, type Song } from './song';
+import { createDefaultChannelNotes, type Note, type Pattern, type PatternID, type Song } from './song';
 import { range } from './utils/utils';
+
+interface ChannelDialogState {
+  channelIndex: number;
+}
 
 interface FrameEditorProps {
   frame: Song['frames'][number];
@@ -24,6 +30,13 @@ function resolvePattern(patterns: Pattern[], patternId: PatternID | null | undef
 export function FrameEditor(props: FrameEditorProps) {
   const rowIndices = () => (props.patternLength > 0 ? range(0, props.patternLength - 1) : []);
   const fallbackNotes = createDefaultChannelNotes();
+  const channelContextMenu = createContextMenuController<{ channelIndex: number }>();
+  const [channelDialogState, setChannelDialogState] = createSignal<ChannelDialogState | null>(null);
+
+  function handleSaveChannelNotes(channelIndex: number, notes: Note[] | undefined) {
+    const channel = props.channels[channelIndex];
+    channel.notes = notes;
+  }
 
   return (
     <div class={styles.frameEditor}>
@@ -55,7 +68,12 @@ export function FrameEditor(props: FrameEditorProps) {
 
           return (
             <div class={styles.channelColumn}>
-              <div class={styles.channelHeader}>Channel {channelIndex + 1}</div>
+              <div
+                class={styles.channelHeader}
+                onContextMenu={(event) => channelContextMenu.open(event, { channelIndex })}
+              >
+                Channel {channelIndex + 1}
+              </div>
               <Show when={resolvedPattern()} fallback={<div class={styles.channelPlaceholder}>No pattern</div>}>
                 {(patternMut) => (
                   <PatternEditor
@@ -74,6 +92,33 @@ export function FrameEditor(props: FrameEditorProps) {
           );
         }}
       </Index>
+      <ContextMenu anchor={channelContextMenu.anchor} onClose={channelContextMenu.close}>
+        {() => {
+          const payload = channelContextMenu.data();
+          if (!payload) {
+            return;
+          }
+          return (
+            <ContextMenuItem onClick={() => setChannelDialogState({ channelIndex: payload.channelIndex })}>
+              Configure Channel
+            </ContextMenuItem>
+          );
+        }}
+      </ContextMenu>
+      <Show when={channelDialogState()}>
+        {(state) => (
+          <ChannelConfigDialog
+            open={true}
+            channelName={`Channel ${state().channelIndex + 1}`}
+            initialNotes={props.channels[state().channelIndex]?.notes}
+            onCancel={() => setChannelDialogState(null)}
+            onSave={(notes) => {
+              setChannelDialogState(null);
+              handleSaveChannelNotes(state().channelIndex, notes);
+            }}
+          />
+        )}
+      </Show>
     </div>
   );
 }
