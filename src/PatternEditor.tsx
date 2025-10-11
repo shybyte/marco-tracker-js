@@ -10,7 +10,6 @@ import {
   C0,
   C1,
   C3,
-  C4,
   Cis_1,
   Cis0,
   Cis1,
@@ -42,7 +41,6 @@ import cssClasses from './PatternEditor.module.css';
 import { createEmptyPatternStep, type Note, type Pattern, type PatternStep } from './song';
 import { ensureArrayLength, focusElement, range } from './utils/utils';
 
-const notes = range(C3, C4);
 type NoteDisplayMode = 'PianoRoll' | 'Tracker';
 
 interface PatternEditorProps {
@@ -53,6 +51,7 @@ interface PatternEditorProps {
   recordMode: boolean;
   stepsPerBeat: number;
   channel: MidiCannel;
+  allowedNotes: readonly Note[];
 }
 
 export function PatternEditor(props: PatternEditorProps) {
@@ -140,7 +139,7 @@ export function PatternEditor(props: PatternEditorProps) {
             {(_step, i) => (
               <NoteRow
                 pos={i}
-                notes={notes}
+                allowedNotes={props.allowedNotes}
                 step={props.patternMut.steps[i] ?? createEmptyPatternStep()}
                 isPlayPos={i === props.playPos}
                 stepsPerBeat={props.stepsPerBeat}
@@ -177,7 +176,7 @@ export function PatternEditor(props: PatternEditorProps) {
 
 interface NoteRowProps {
   pos: number;
-  notes: Note[];
+  allowedNotes: readonly Note[];
   step: PatternStep;
   toggleNote: (note: Note) => void;
   isPlayPos: boolean;
@@ -194,12 +193,12 @@ function NoteRow(props: NoteRowProps) {
       }}
     >
       <Show when={props.displayMode() === 'Tracker'}>
-        <td class={cssClasses.trackerCell} colSpan={props.notes.length}>
+        <td class={cssClasses.trackerCell} colSpan={props.allowedNotes.length}>
           {props.step.notes.length > 0 ? formatTrackerNotes(props.step.notes) : '---'}
         </td>
       </Show>
       <Show when={props.displayMode() === 'PianoRoll'}>
-        <Index each={props.notes}>
+        <Index each={props.allowedNotes}>
           {(note) => {
             const noteValue = note();
             return (

@@ -1,4 +1,5 @@
-import { maxBy, times } from './utils/utils';
+import { C3, C4 } from './notes';
+import { maxBy, range, times } from './utils/utils';
 
 export type PatternID = string; // unique relative to the channel
 
@@ -12,6 +13,7 @@ export interface Song {
 
 export interface Channel {
   patterns: Pattern[];
+  notes?: Note[];
 }
 
 interface Frame {
@@ -31,6 +33,10 @@ export interface PatternStep {
 
 export function createEmptyPatternStep(): PatternStep {
   return { notes: [] };
+}
+
+export function createDefaultChannelNotes(): Note[] {
+  return range(C3, C4);
 }
 
 export function createEmptySong(): Song {
@@ -62,6 +68,13 @@ export function normalizeSong(song: Song): Song {
   song.channels.forEach((channel) => {
     if (!Array.isArray(channel.patterns)) {
       channel.patterns = [];
+    }
+
+    if (Array.isArray(channel.notes)) {
+      const sanitizedNotes = channel.notes.filter((note): note is Note => typeof note === 'number');
+      channel.notes = sanitizedNotes.length > 0 ? sanitizedNotes : undefined;
+    } else if (channel.notes !== undefined) {
+      channel.notes = undefined;
     }
 
     channel.patterns.forEach((pattern, index) => {

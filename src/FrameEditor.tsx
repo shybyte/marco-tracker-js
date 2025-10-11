@@ -1,7 +1,7 @@
 import { For, Index, type Setter, Show } from 'solid-js';
 import styles from './FrameEditor.module.css';
 import { PatternEditor } from './PatternEditor';
-import type { Pattern, PatternID, Song } from './song';
+import { createDefaultChannelNotes, type Pattern, type PatternID, type Song } from './song';
 import { range } from './utils/utils';
 
 interface FrameEditorProps {
@@ -23,6 +23,7 @@ function resolvePattern(patterns: Pattern[], patternId: PatternID | null | undef
 
 export function FrameEditor(props: FrameEditorProps) {
   const rowIndices = () => (props.patternLength > 0 ? range(0, props.patternLength - 1) : []);
+  const fallbackNotes = createDefaultChannelNotes();
 
   return (
     <div class={styles.frameEditor}>
@@ -65,6 +66,7 @@ export function FrameEditor(props: FrameEditorProps) {
                     recordMode={props.recordMode}
                     stepsPerBeat={props.stepsPerBeat}
                     channel={channelIndex}
+                    allowedNotes={props.channels[channelIndex]?.notes ?? fallbackNotes}
                   />
                 )}
               </Show>
