@@ -4,6 +4,36 @@
   align-items: flex-start;
 }
 
+.rowIndexColumn {
+  display: grid;
+  align-content: start;
+  row-gap: 5px;
+  min-width: 50px;
+}
+
+.rowIndexHeader {
+  font-weight: bold;
+  text-align: right;
+  padding-right: 8px;
+  margin-bottom: 8px;
+}
+
+.rowIndex {
+  padding: 4px 8px;
+  text-align: right;
+  border-radius: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.playPos {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.beatStep {
+  color: #fff;
+  font-weight: bold;
+}
+
 .channelColumn {
   flex: 1 1 0;
   min-width: 240px;

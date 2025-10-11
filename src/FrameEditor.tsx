@@ -1,7 +1,8 @@
-import { Index, type Setter, Show } from 'solid-js';
+import { For, Index, type Setter, Show } from 'solid-js';
 import styles from './FrameEditor.module.css';
 import { PatternEditor } from './PatternEditor';
 import type { Pattern, PatternID, Song } from './song';
+import { range } from './utils/utils';
 
 interface FrameEditorProps {
   frame: Song['frames'][number];
@@ -21,8 +22,26 @@ function resolvePattern(patterns: Pattern[], patternId: PatternID | null | undef
 }
 
 export function FrameEditor(props: FrameEditorProps) {
+  const rowIndices = () => (props.patternLength > 0 ? range(0, props.patternLength - 1) : []);
+
   return (
     <div class={styles.frameEditor}>
+      <div class={styles.rowIndexColumn}>
+        <div class={styles.rowIndexHeader}>Pos</div>
+        <For each={rowIndices()}>
+          {(pos) => (
+            <div
+              classList={{
+                [styles.rowIndex]: true,
+                [styles.playPos]: pos === props.playPos,
+                [styles.beatStep]: pos % props.stepsPerBeat === 0,
+              }}
+            >
+              {pos}
+            </div>
+          )}
+        </For>
+      </div>
       <Index each={props.frame.channels}>
         {(patternIdAccessor, channelIndex) => {
           const resolvedPattern = () => {

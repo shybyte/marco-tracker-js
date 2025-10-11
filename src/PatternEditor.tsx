@@ -187,16 +187,16 @@ interface NoteRowProps {
 
 function NoteRow(props: NoteRowProps) {
   return (
-    <tr classList={{ [cssClasses.playPos]: props.isPlayPos }}>
-      <td
-        classList={{
-          [cssClasses.beatStep]: props.pos % props.stepsPerBeat === 0,
-        }}
-      >
-        {props.pos}
-      </td>
+    <tr
+      classList={{
+        [cssClasses.playPos]: props.isPlayPos,
+        [cssClasses.beatRow]: props.pos % props.stepsPerBeat === 0,
+      }}
+    >
       <Show when={props.displayMode() === 'Tracker'}>
-        {props.step.notes.length > 0 ? formatTrackerNotes(props.step.notes) : '---'}
+        <td class={cssClasses.trackerCell} colSpan={props.notes.length}>
+          {props.step.notes.length > 0 ? formatTrackerNotes(props.step.notes) : '---'}
+        </td>
       </Show>
       <Show when={props.displayMode() === 'PianoRoll'}>
         <Index each={props.notes}>

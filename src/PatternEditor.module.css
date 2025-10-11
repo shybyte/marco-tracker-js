@@ -24,9 +24,13 @@
   filter: brightness(1.2);
 }
 
-.beatStep {
-  color: #fff;
-  font-weight: bold;
+.beatRow {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.trackerCell {
+  padding: 4px;
+  white-space: nowrap;
 }
 
 .noteCell {
