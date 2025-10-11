@@ -14,6 +14,7 @@ interface PatternMatrixProps {
   onInsertFrame: (insertIndex: number) => void;
   onDeleteFrame: (frameIndex: number) => void;
   onAddChannel: () => void;
+  onRemoveChannel: (channelIndex: number) => void;
 }
 
 const NEW_PATTERN_VALUE = '__new_pattern__';
@@ -25,33 +26,32 @@ export function PatternMatrix(props: PatternMatrixProps) {
       maxBy(props.frames, (frame) => frame.channels.length)
     );
 
-  const contextMenu = createContextMenuController<number | null>();
+  type ContextMenuPayload = { type: 'matrix' } | { type: 'frame'; index: number } | { type: 'channel'; index: number };
 
-  const handleAddRow = () => {
-    const targetIndex = contextMenu.data();
-    const insertIndex = targetIndex == null ? props.frames.length : targetIndex + 1;
-    props.onInsertFrame(insertIndex);
-  };
+  const contextMenu = createContextMenuController<ContextMenuPayload>();
 
-  const handleDeleteRow = () => {
-    const targetIndex = contextMenu.data();
-    if (targetIndex !== null && targetIndex !== undefined) {
-      props.onDeleteFrame(targetIndex);
+  function handleRemoveChannel(channelIndex: number) {
+    const confirmed = window.confirm(`Remove channel ${channelIndex}? This will delete it from all frames.`);
+    if (confirmed) {
+      props.onRemoveChannel(channelIndex);
     }
-  };
-
-  const handleAddChannel = () => {
-    props.onAddChannel();
-  };
+  }
 
   return (
-    <div class={styles.patternMatrix} onContextMenu={(event) => contextMenu.open(event, null)}>
+    <div class={styles.patternMatrix} onContextMenu={(event) => contextMenu.open(event, { type: 'matrix' })}>
       <table class={styles.table}>
         <thead>
           <tr>
             <th class={styles.headerCell}>Frame</th>
             <For each={Array.from({ length: maxChannels() })}>
-              {(_, index) => <th class={styles.headerCell}>Ch {index() + 1}</th>}
+              {(_, index) => (
+                <th
+                  class={styles.headerCell}
+                  onContextMenu={(event) => contextMenu.open(event, { type: 'channel', index: index() })}
+                >
+                  Ch {index() + 1}
+                </th>
+              )}
             </For>
           </tr>
         </thead>
@@ -63,7 +63,7 @@ export function PatternMatrix(props: PatternMatrixProps) {
                   [styles.selectedRow]: index() === props.selectedFrame,
                 }}
                 onClick={() => props.onSelectFrame(index())}
-                onContextMenu={(event) => contextMenu.open(event, index())}
+                onContextMenu={(event) => contextMenu.open(event, { type: 'frame', index: index() })}
               >
                 <td>{index() + 1}</td>
                 <For each={Array.from({ length: maxChannels() })}>
@@ -104,9 +104,32 @@ export function PatternMatrix(props: PatternMatrixProps) {
         </tbody>
       </table>
       <ContextMenu anchor={contextMenu.anchor} onClose={contextMenu.close}>
-        <ContextMenuItem onClick={handleAddChannel}>Add Channel</ContextMenuItem>
-        <ContextMenuItem onClick={handleAddRow}>Add Row Below</ContextMenuItem>
-        {contextMenu.data() != null && <ContextMenuItem onClick={handleDeleteRow}>Delete Row</ContextMenuItem>}
+        {() => {
+          const payload = contextMenu.data();
+          if (!payload) {
+            return <></>;
+          }
+
+          return (
+            <>
+              <ContextMenuItem onClick={props.onAddChannel}>Add Channel</ContextMenuItem>
+
+              <ContextMenuItem
+                onClick={() => props.onInsertFrame(payload.type === 'frame' ? payload.index + 1 : props.frames.length)}
+              >
+                Add Row Below
+              </ContextMenuItem>
+
+              {payload.type === 'frame' && (
+                <ContextMenuItem onClick={() => props.onDeleteFrame(payload.index)}>Delete Row</ContextMenuItem>
+              )}
+
+              {payload.type === 'channel' && (
+                <ContextMenuItem onClick={() => handleRemoveChannel(payload.index)}>Remove Channel</ContextMenuItem>
+              )}
+            </>
+          );
+        }}
       </ContextMenu>
     </div>
   );

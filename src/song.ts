@@ -166,3 +166,15 @@ export function deleteFrame(song: Song, frameIndex: number): void {
 
   song.frames.splice(frameIndex, 1);
 }
+
+export function removeChannel(song: Song, channelIndex: number): void {
+  if (channelIndex < 0 || channelIndex >= song.channels.length) {
+    throw new Error(`Invalid channelIndex ${channelIndex}`);
+  }
+
+  song.channels.splice(channelIndex, 1);
+
+  song.frames.forEach((frame) => {
+    frame.channels.splice(channelIndex, 1);
+  });
+}

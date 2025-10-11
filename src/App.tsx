@@ -14,7 +14,15 @@ import {
   type MidiOutputInfo,
 } from './instruments';
 import { PatternMatrix } from './PatternMatrix';
-import { Song, addChannel, createEmptySong, createPatternForChannel, deleteFrame, insertFrame } from './song';
+import {
+  Song,
+  addChannel,
+  createEmptySong,
+  createPatternForChannel,
+  deleteFrame,
+  insertFrame,
+  removeChannel,
+} from './song';
 import { loadSong, saveSong } from './storage';
 import { AccurateInterval } from './utils/interval';
 import { getStepTimeInSecondsForBmp } from './utils/utils';
@@ -222,6 +230,7 @@ const App: Component = () => {
             onInsertFrame={handleInsertFrame}
             onDeleteFrame={handleDeleteFrame}
             onAddChannel={() => addChannel(song)}
+            onRemoveChannel={(channelIndex) => removeChannel(song, channelIndex)}
           />
           <Show when={currentFrame()} fallback={<div class={styles.framePlaceholder}>No frame selected</div>}>
             {(frame) => (

@@ -1,17 +1,6 @@
 import { Accessor, JSX, createContext, createEffect, createSignal, onCleanup, useContext } from 'solid-js';
 import styles from './ContextMenu.module.css';
 
-interface ContextMenuProps {
-  anchor: Accessor<{ x: number; y: number } | null>;
-  onClose: () => void;
-  children: JSX.Element;
-}
-
-interface ContextMenuItemProps {
-  onClick: () => void;
-  children: JSX.Element;
-}
-
 export interface ContextMenuController<T> {
   anchor: Accessor<{ x: number; y: number } | null>;
   data: Accessor<T | undefined>;
@@ -45,6 +34,12 @@ export function createContextMenuController<T>(): ContextMenuController<T> {
   };
 }
 
+interface ContextMenuProps {
+  anchor: Accessor<{ x: number; y: number } | null>;
+  onClose: () => void;
+  children: () => JSX.Element;
+}
+
 export function ContextMenu(props: ContextMenuProps) {
   let menuRef: HTMLDivElement | undefined;
 
@@ -56,7 +51,8 @@ export function ContextMenu(props: ContextMenuProps) {
     const position = props.anchor();
 
     if (position) {
-      setMenuPosition(menuRef, position.x, position.y);
+      menuRef.style.setProperty('--context-menu-anchor-x', `${position.x}px`);
+      menuRef.style.setProperty('--context-menu-anchor-y', `${position.y}px`);
       menuRef.showPopover();
     } else {
       menuRef.hidePopover();
@@ -102,10 +98,15 @@ export function ContextMenu(props: ContextMenuProps) {
           event.stopPropagation();
         }}
       >
-        {props.children}
+        {props.children()}
       </div>
     </ContextMenuContext.Provider>
   );
+}
+
+interface ContextMenuItemProps {
+  onClick: () => void;
+  children: JSX.Element;
 }
 
 export function ContextMenuItem(props: ContextMenuItemProps) {
@@ -127,9 +128,4 @@ export function ContextMenuItem(props: ContextMenuItemProps) {
       {props.children}
     </button>
   );
-}
-
-function setMenuPosition(menu: HTMLDivElement, x: number, y: number) {
-  menu.style.setProperty('--context-menu-anchor-x', `${x}px`);
-  menu.style.setProperty('--context-menu-anchor-y', `${y}px`);
 }

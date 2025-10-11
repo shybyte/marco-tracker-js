@@ -25,7 +25,13 @@ export function FrameEditor(props: FrameEditorProps) {
     <div class={styles.frameEditor}>
       <Index each={props.frame.channels}>
         {(patternIdAccessor, channelIndex) => {
-          const resolvedPattern = () => resolvePattern(props.channels[channelIndex].patterns, patternIdAccessor());
+          const resolvedPattern = () => {
+            const channel = props.channels[channelIndex];
+            if (!channel) {
+              return undefined; // This can happen while deleting a column
+            }
+            return resolvePattern(channel.patterns, patternIdAccessor());
+          };
 
           return (
             <div class={styles.channelColumn}>
