@@ -1,0 +1,112 @@
+.channelDialog {
+  border: none;
+  border-radius: 12px;
+  padding: 0;
+  background: #202024;
+  color: #fff;
+  width: min(90vw, 480px);
+
+  &::backdrop {
+    background: rgba(0, 0, 0, 0.6);
+  }
+}
+
+.channelDialogForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px;
+}
+
+.channelDialogHeader {
+  margin-bottom: 4px;
+
+  h2 {
+    margin: 0;
+    font-size: 1.2rem;
+  }
+}
+
+.channelDialogHint {
+  margin: 0;
+  color: #c4c4c4;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.channelDialogTextarea {
+  min-height: 120px;
+  resize: vertical;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #444;
+  background: #111;
+  color: #fff;
+  font-family: 'Fira Code', 'Source Code Pro', monospace;
+  font-size: 0.95rem;
+  line-height: 1.4;
+
+  &:focus-visible {
+    outline: 2px solid rgba(90, 150, 255, 0.6);
+    border-color: rgba(90, 150, 255, 0.9);
+  }
+}
+
+.channelDialogError {
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: rgba(220, 53, 69, 0.2);
+  color: #ff8686;
+  font-size: 0.9rem;
+}
+
+.channelDialogPreview {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 0.9rem;
+}
+
+.channelDialogPreviewLabel {
+  font-weight: bold;
+  color: #d1d1d1;
+}
+
+.channelDialogPreviewValue {
+  color: #f5f5f5;
+}
+
+.channelDialogActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+
+  button {
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font: inherit;
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    transition: background 0.2s ease;
+
+    &:hover,
+    &:focus-visible {
+      background: rgba(255, 255, 255, 0.16);
+      outline: none;
+    }
+  }
+
+  button[type='submit'] {
+    background: #3578e5;
+
+    &:hover,
+    &:focus-visible {
+      background: #4a8df5;
+    }
+  }
+}

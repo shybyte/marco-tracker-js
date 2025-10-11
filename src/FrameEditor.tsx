@@ -92,19 +92,19 @@ export function FrameEditor(props: FrameEditorProps) {
           );
         }}
       </Index>
-      <ContextMenu anchor={channelContextMenu.anchor} onClose={channelContextMenu.close}>
-        {() => {
-          const payload = channelContextMenu.data();
-          if (!payload) {
-            return;
-          }
-          return (
-            <ContextMenuItem onClick={() => setChannelDialogState({ channelIndex: payload.channelIndex })}>
-              Configure Channel
-            </ContextMenuItem>
-          );
-        }}
+
+      <ContextMenu
+        payload={channelContextMenu.data()}
+        anchor={channelContextMenu.anchor}
+        onClose={channelContextMenu.close}
+      >
+        {(payload) => (
+          <ContextMenuItem onClick={() => setChannelDialogState({ channelIndex: payload.channelIndex })}>
+            Configure Channel
+          </ContextMenuItem>
+        )}
       </ContextMenu>
+
       <Show when={channelDialogState()}>
         {(state) => (
           <ChannelConfigDialog

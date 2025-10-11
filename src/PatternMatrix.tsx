@@ -95,33 +95,23 @@ export function PatternMatrix(props: PatternMatrixProps) {
           </For>
         </tbody>
       </table>
-      <ContextMenu anchor={contextMenu.anchor} onClose={contextMenu.close}>
-        {() => {
-          const payload = contextMenu.data();
-          if (!payload) {
-            return;
-          }
-
-          return (
-            <>
-              <ContextMenuItem onClick={props.onAddChannel}>Add Channel</ContextMenuItem>
-
-              <ContextMenuItem
-                onClick={() => props.onInsertFrame(payload.type === 'frame' ? payload.index + 1 : props.frames.length)}
-              >
-                Add Row Below
-              </ContextMenuItem>
-
-              {payload.type === 'frame' && (
-                <ContextMenuItem onClick={() => props.onDeleteFrame(payload.index)}>Delete Row</ContextMenuItem>
-              )}
-
-              {payload.type === 'channel' && (
-                <ContextMenuItem onClick={() => handleRemoveChannel(payload.index)}>Remove Channel</ContextMenuItem>
-              )}
-            </>
-          );
-        }}
+      <ContextMenu payload={contextMenu.data()} anchor={contextMenu.anchor} onClose={contextMenu.close}>
+        {(payload) => (
+          <>
+            <ContextMenuItem onClick={props.onAddChannel}>Add Channel</ContextMenuItem>
+            <ContextMenuItem
+              onClick={() => props.onInsertFrame(payload.type === 'frame' ? payload.index + 1 : props.frames.length)}
+            >
+              Add Row Below
+            </ContextMenuItem>
+            {payload.type === 'frame' && (
+              <ContextMenuItem onClick={() => props.onDeleteFrame(payload.index)}>Delete Row</ContextMenuItem>
+            )}
+            {payload.type === 'channel' && (
+              <ContextMenuItem onClick={() => handleRemoveChannel(payload.index)}>Remove Channel</ContextMenuItem>
+            )}
+          </>
+        )}
       </ContextMenu>
     </div>
   );

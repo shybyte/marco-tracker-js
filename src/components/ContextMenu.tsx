@@ -1,4 +1,13 @@
-import { type Accessor, createContext, createEffect, createSignal, type JSX, onCleanup, useContext } from 'solid-js';
+import {
+  type Accessor,
+  createContext,
+  createEffect,
+  createSignal,
+  type JSX,
+  onCleanup,
+  Show,
+  useContext,
+} from 'solid-js';
 import styles from './ContextMenu.module.css';
 
 export interface ContextMenuController<T> {
@@ -34,13 +43,14 @@ export function createContextMenuController<T>(): ContextMenuController<T> {
   };
 }
 
-interface ContextMenuProps {
+interface ContextMenuProps<T> {
   anchor: Accessor<{ x: number; y: number } | null>;
   onClose: () => void;
-  children: () => JSX.Element;
+  payload: T | undefined;
+  children: (payload: T) => JSX.Element;
 }
 
-export function ContextMenu(props: ContextMenuProps) {
+export function ContextMenu<T>(props: ContextMenuProps<T>) {
   let menuRef: HTMLDivElement | undefined;
 
   createEffect(() => {
@@ -98,7 +108,7 @@ export function ContextMenu(props: ContextMenuProps) {
           event.stopPropagation();
         }}
       >
-        {props.children()}
+        <Show when={props.payload}>{(payload) => props.children(payload())}</Show>
       </div>
     </ContextMenuContext.Provider>
   );
