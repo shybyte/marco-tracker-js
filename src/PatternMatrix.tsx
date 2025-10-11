@@ -1,7 +1,6 @@
 import { For } from 'solid-js';
 import type { Song } from './song';
 import styles from './PatternMatrix.module.css';
-import { maxBy } from './utils/utils';
 import { ContextMenu, ContextMenuItem, createContextMenuController } from './components/ContextMenu';
 
 interface PatternMatrixProps {
@@ -20,14 +19,7 @@ interface PatternMatrixProps {
 const NEW_PATTERN_VALUE = '__new_pattern__';
 
 export function PatternMatrix(props: PatternMatrixProps) {
-  const maxChannels = () =>
-    Math.max(
-      props.channels.length,
-      maxBy(props.frames, (frame) => frame.channels.length)
-    );
-
   type ContextMenuPayload = { type: 'matrix' } | { type: 'frame'; index: number } | { type: 'channel'; index: number };
-
   const contextMenu = createContextMenuController<ContextMenuPayload>();
 
   function handleRemoveChannel(channelIndex: number) {
@@ -43,7 +35,7 @@ export function PatternMatrix(props: PatternMatrixProps) {
         <thead>
           <tr>
             <th class={styles.headerCell}>Frame</th>
-            <For each={Array.from({ length: maxChannels() })}>
+            <For each={props.channels}>
               {(_, index) => (
                 <th
                   class={styles.headerCell}
@@ -66,7 +58,7 @@ export function PatternMatrix(props: PatternMatrixProps) {
                 onContextMenu={(event) => contextMenu.open(event, { type: 'frame', index: index() })}
               >
                 <td>{index() + 1}</td>
-                <For each={Array.from({ length: maxChannels() })}>
+                <For each={props.channels}>
                   {(_, channelIndex) => {
                     return (
                       <td>
