@@ -35,3 +35,9 @@ export function maxBy<T>(items: readonly T[], getValue: (item: T) => number): nu
 
   return maxValue === Number.NEGATIVE_INFINITY ? 0 : maxValue;
 }
+
+export function setter<Obj extends object, Key extends keyof Obj>(object: Obj, key: Key) {
+  return (value: Obj[Key]) => {
+    object[key] = value;
+  };
+}
