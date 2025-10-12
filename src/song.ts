@@ -14,7 +14,10 @@ export interface Song {
 export interface Channel {
   patterns: Pattern[];
   notes?: Note[];
+  mode: ChannelMode;
 }
+
+export type ChannelMode = 'pianoRoll' | 'tracker';
 
 interface Frame {
   channels: Array<PatternID | null>;
@@ -47,7 +50,10 @@ export function createEmptySong(): Song {
     tempo: 120,
     stepsPerBeat: 4,
     patternLength: patternLength,
-    channels: [{ patterns: [channel0Pattern] }, { patterns: [channel1Pattern] }],
+    channels: [
+      { patterns: [channel0Pattern], mode: 'pianoRoll' },
+      { patterns: [channel1Pattern], mode: 'pianoRoll' },
+    ],
     frames: [
       { channels: [channel0Pattern.id, null] }, //
       { channels: [channel0Pattern.id, channel1Pattern.id] },
@@ -76,6 +82,8 @@ export function normalizeSong(song: Song): Song {
     } else if (channel.notes !== undefined) {
       channel.notes = undefined;
     }
+
+    channel.mode = channel.mode === 'tracker' ? 'tracker' : 'pianoRoll';
 
     channel.patterns.forEach((pattern, index) => {
       if (pattern.id === undefined || pattern.id === null) {
@@ -143,7 +151,7 @@ export function createPatternForChannel(song: Song, channelIndex: number): Patte
 
 export function addChannel(song: Song): number {
   const newChannelIndex = song.channels.length;
-  song.channels.push({ patterns: [] });
+  song.channels.push({ patterns: [], mode: 'pianoRoll' });
 
   song.frames.forEach((frame) => {
     frame.channels.push(null);

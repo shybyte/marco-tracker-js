@@ -1,4 +1,4 @@
-import { type Accessor, createSignal, Index, type Setter, Show } from 'solid-js';
+import { type Accessor, Index, type Setter, Show } from 'solid-js';
 import { playNote } from './instruments';
 import type { MidiCannel } from './midi-output';
 import {
@@ -38,10 +38,8 @@ import {
   H0,
 } from './notes';
 import cssClasses from './PatternEditor.module.css';
-import { createEmptyPatternStep, type Note, type Pattern, type PatternStep } from './song';
+import { createEmptyPatternStep, type ChannelMode, type Note, type Pattern, type PatternStep } from './song';
 import { ensureArrayLength, focusElement, range } from './utils/utils';
-
-type NoteDisplayMode = 'PianoRoll' | 'Tracker';
 
 interface PatternEditorProps {
   patternMut: Pattern;
@@ -52,11 +50,13 @@ interface PatternEditorProps {
   stepsPerBeat: number;
   channel: MidiCannel;
   allowedNotes: readonly Note[];
+  displayMode: ChannelMode;
+  onDisplayModeChange: (mode: ChannelMode) => void;
 }
 
 export function PatternEditor(props: PatternEditorProps) {
   const baseNote = C3;
-  const [noteDisplayMode, setNoteDisplayMode] = createSignal<NoteDisplayMode>('PianoRoll');
+  const noteDisplayMode = () => props.displayMode;
 
   function onKeyDown(event: KeyboardEvent) {
     if (event.key === 'Delete') {
@@ -126,10 +126,10 @@ export function PatternEditor(props: PatternEditorProps) {
           Display
           <select
             value={noteDisplayMode()}
-            onChange={(event) => setNoteDisplayMode(event.currentTarget.value as NoteDisplayMode)}
+            onChange={(event) => props.onDisplayModeChange(event.currentTarget.value as ChannelMode)}
           >
-            <option value="PianoRoll">PianoRoll</option>
-            <option value="Tracker">Tracker</option>
+            <option value="pianoRoll">PianoRoll</option>
+            <option value="tracker">Tracker</option>
           </select>
         </label>
       </div>
@@ -181,7 +181,7 @@ interface NoteRowProps {
   toggleNote: (note: Note) => void;
   isPlayPos: boolean;
   stepsPerBeat: number;
-  displayMode: Accessor<NoteDisplayMode>;
+  displayMode: Accessor<ChannelMode>;
 }
 
 function NoteRow(props: NoteRowProps) {
@@ -192,12 +192,12 @@ function NoteRow(props: NoteRowProps) {
         [cssClasses.beatRow]: props.pos % props.stepsPerBeat === 0,
       }}
     >
-      <Show when={props.displayMode() === 'Tracker'}>
+      <Show when={props.displayMode() === 'tracker'}>
         <td class={cssClasses.trackerCell} colSpan={props.allowedNotes.length}>
           {props.step.notes.length > 0 ? formatTrackerNotes(props.step.notes) : '---'}
         </td>
       </Show>
-      <Show when={props.displayMode() === 'PianoRoll'}>
+      <Show when={props.displayMode() === 'pianoRoll'}>
         <Index each={props.allowedNotes}>
           {(note) => {
             const noteValue = note();

@@ -85,6 +85,13 @@ export function FrameEditor(props: FrameEditorProps) {
                     stepsPerBeat={props.stepsPerBeat}
                     channel={channelIndex}
                     allowedNotes={props.channels[channelIndex]?.notes ?? fallbackNotes}
+                    displayMode={props.channels[channelIndex]?.mode ?? 'pianoRoll'}
+                    onDisplayModeChange={(mode) => {
+                      const channel = props.channels[channelIndex];
+                      if (channel) {
+                        channel.mode = mode;
+                      }
+                    }}
                   />
                 )}
               </Show>
