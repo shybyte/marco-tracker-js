@@ -2,12 +2,15 @@
   display: flex;
   gap: 16px;
   align-items: flex-start;
+  --step-gap: 5px;
+  --step-height: 32px;
+  overflow-x: auto;
 }
 
 .rowIndexColumn {
-  display: grid;
-  align-content: start;
-  row-gap: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--step-gap);
   min-width: 50px;
 }
 
@@ -15,11 +18,15 @@
   font-weight: bold;
   text-align: right;
   padding-right: 8px;
-  margin-bottom: 8px;
+  margin: 0;
 }
 
 .rowIndex {
-  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: var(--step-height);
+  padding: 0 8px;
   text-align: right;
   border-radius: 4px;
   font-variant-numeric: tabular-nums;
@@ -35,7 +42,9 @@
 }
 
 .channelColumn {
-  flex: 1 1 0;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
   min-width: 240px;
 }
 
