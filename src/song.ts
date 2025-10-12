@@ -12,6 +12,7 @@ export interface Song {
 }
 
 export interface Channel {
+  name?: string;
   patterns: Pattern[];
   notes?: Note[];
   mode: ChannelMode;
@@ -72,6 +73,13 @@ export function normalizeSong(song: Song): Song {
   }
 
   song.channels.forEach((channel) => {
+    if (typeof channel.name !== 'string') {
+      channel.name = undefined;
+    } else {
+      const trimmedName = channel.name.trim();
+      channel.name = trimmedName === '' ? undefined : trimmedName;
+    }
+
     if (!Array.isArray(channel.patterns)) {
       channel.patterns = [];
     }

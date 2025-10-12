@@ -13,10 +13,6 @@ import {
 } from './song';
 import { range } from './utils/utils';
 
-interface ChannelDialogState {
-  channelIndex: number;
-}
-
 interface FrameEditorProps {
   frame: Song['frames'][number];
   channels: Song['channels'];
@@ -25,6 +21,10 @@ interface FrameEditorProps {
   setPlayPos: Setter<number>;
   recordMode: boolean;
   stepsPerBeat: number;
+}
+
+interface ChannelDialogState {
+  channelIndex: number;
 }
 
 function resolvePattern(patterns: Pattern[], patternId: PatternID | null | undefined): Pattern | undefined {
@@ -40,10 +40,14 @@ export function FrameEditor(props: FrameEditorProps) {
   const channelContextMenu = createContextMenuController<{ channelIndex: number }>();
   const [channelDialogState, setChannelDialogState] = createSignal<ChannelDialogState | null>(null);
 
-  function handleSaveChannelConfig(channelIndex: number, config: { notes: Note[] | undefined; mode: ChannelMode }) {
+  function handleSaveChannelConfig(
+    channelIndex: number,
+    config: { name: string | undefined; notes: Note[] | undefined; mode: ChannelMode },
+  ) {
     const channel = props.channels[channelIndex];
     channel.notes = config.notes;
     channel.mode = config.mode;
+    channel.name = config.name;
   }
 
   return (
@@ -66,6 +70,9 @@ export function FrameEditor(props: FrameEditorProps) {
       </div>
       <Index each={props.frame.channels}>
         {(patternIdAccessor, channelIndex) => {
+          const defaultChannelName = `Channel ${channelIndex + 1}`;
+          const displayChannelName = () => props.channels[channelIndex]?.name ?? defaultChannelName;
+
           const resolvedPattern = () => {
             const channel = props.channels[channelIndex];
             if (!channel) {
@@ -80,7 +87,7 @@ export function FrameEditor(props: FrameEditorProps) {
                 class={styles.channelHeader}
                 onContextMenu={(event) => channelContextMenu.open(event, { channelIndex })}
               >
-                Channel {channelIndex + 1}
+                {displayChannelName()}
               </div>
               <Show when={resolvedPattern()} fallback={<div class={styles.channelPlaceholder}>No pattern</div>}>
                 {(patternMut) => (
@@ -115,19 +122,28 @@ export function FrameEditor(props: FrameEditorProps) {
       </ContextMenu>
 
       <Show when={channelDialogState()}>
-        {(state) => (
-          <ChannelConfigDialog
-            open={true}
-            channelName={`Channel ${state().channelIndex + 1}`}
-            initialNotes={props.channels[state().channelIndex]?.notes}
-            initialMode={props.channels[state().channelIndex]?.mode}
-            onCancel={() => setChannelDialogState(null)}
-            onSave={(config) => {
-              handleSaveChannelConfig(state().channelIndex, config);
-              setChannelDialogState(null);
-            }}
-          />
-        )}
+        {(state) => {
+          const channelIndex = state().channelIndex;
+          const defaultChannelName = `Channel ${channelIndex + 1}`;
+          const channel = props.channels[channelIndex];
+          const displayName = channel?.name ?? defaultChannelName;
+
+          return (
+            <ChannelConfigDialog
+              open={true}
+              dialogTitle={`Configure ${displayName}`}
+              defaultName={defaultChannelName}
+              initialName={channel?.name}
+              initialNotes={channel?.notes}
+              initialMode={channel?.mode}
+              onCancel={() => setChannelDialogState(null)}
+              onSave={(config) => {
+                handleSaveChannelConfig(channelIndex, config);
+                setChannelDialogState(null);
+              }}
+            />
+          );
+        }}
       </Show>
     </div>
   );

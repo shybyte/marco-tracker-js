@@ -36,14 +36,19 @@ export function PatternMatrix(props: PatternMatrixProps) {
           <tr>
             <th class={styles.headerCell}>Frame</th>
             <For each={props.channels}>
-              {(_, index) => (
-                <th
-                  class={styles.headerCell}
-                  onContextMenu={(event) => contextMenu.open(event, { type: 'channel', index: index() })}
-                >
-                  Ch {index() + 1}
-                </th>
-              )}
+              {(_, index) => {
+                const defaultChannelLabel = `Ch ${index() + 1}`;
+                const channelName = () => props.channels[index()]?.name ?? defaultChannelLabel;
+
+                return (
+                  <th
+                    class={styles.headerCell}
+                    onContextMenu={(event) => contextMenu.open(event, { type: 'channel', index: index() })}
+                  >
+                    {channelName()}
+                  </th>
+                );
+              }}
             </For>
           </tr>
         </thead>

@@ -4,7 +4,9 @@ import styles from './ChannelConfigDialog.module.css';
 
 export interface ChannelConfigDialogProps {
   open: boolean;
-  channelName: string;
+  dialogTitle: string;
+  defaultName: string;
+  initialName?: string;
   initialNotes?: readonly Note[];
   initialMode?: ChannelMode;
   onCancel: () => void;
@@ -34,12 +36,14 @@ const DEFAULT_NOTES_COUNT = DEFAULT_CHANNEL_NOTES.length;
 const DEFAULT_CHANNEL_MODE: ChannelMode = 'pianoRoll';
 
 interface ChannelConfigResult {
+  name: string | undefined;
   notes: Note[] | undefined;
   mode: ChannelMode;
 }
 
 export function ChannelConfigDialog(props: ChannelConfigDialogProps) {
   let dialogRef: HTMLDialogElement;
+  const [nameInputValue, setNameInputValue] = createSignal('');
   const [notesInputValue, setNotesInputValue] = createSignal('');
   const [parseError, setParseError] = createSignal<string | null>(null);
   const [previewNotes, setPreviewNotes] = createSignal<Note[]>([]);
@@ -86,6 +90,7 @@ export function ChannelConfigDialog(props: ChannelConfigDialogProps) {
       return;
     }
 
+    setNameInputValue(props.initialName ?? '');
     setMode(props.initialMode ?? DEFAULT_CHANNEL_MODE);
     const initialNotes = props.initialNotes ?? [];
     setNotesInputValue(initialNotes.length > 0 ? formatNotesList(initialNotes) : '');
@@ -123,10 +128,11 @@ export function ChannelConfigDialog(props: ChannelConfigDialogProps) {
 
   function handleSubmit(event: SubmitEvent) {
     event.preventDefault();
+    const normalizedName = normalizeChannelName(nameInputValue());
     const trimmedNotes = notesInputValue().trim();
 
     if (trimmedNotes === '') {
-      props.onSave({ notes: undefined, mode: mode() });
+      props.onSave({ name: normalizedName, notes: undefined, mode: mode() });
       dialogRef.close();
       return;
     }
@@ -139,6 +145,7 @@ export function ChannelConfigDialog(props: ChannelConfigDialogProps) {
     }
 
     props.onSave({
+      name: normalizedName,
       notes: parseResult.notes.length > 0 ? parseResult.notes : undefined,
       mode: mode(),
     });
@@ -149,8 +156,21 @@ export function ChannelConfigDialog(props: ChannelConfigDialogProps) {
     <dialog ref={assignDialogRef} class={styles.channelDialog}>
       <form method="dialog" class={styles.channelDialogForm} onSubmit={handleSubmit}>
         <header class={styles.channelDialogHeader}>
-          <h2>{props.channelName}</h2>
+          <h2>{props.dialogTitle}</h2>
         </header>
+        <div class={styles.channelDialogName}>
+          <label class={styles.channelDialogNameLabel} for="channel-config-name">
+            Channel name (optional)
+          </label>
+          <input
+            id="channel-config-name"
+            class={styles.channelDialogNameInput}
+            type="text"
+            value={nameInputValue()}
+            onInput={(event) => setNameInputValue(event.currentTarget.value)}
+            placeholder={props.defaultName}
+          />
+        </div>
         <p class={styles.channelDialogHint}>
           Enter note names (for example `C3`, `C#3`, `Eb4`) or MIDI note numbers separated by spaces or commas. Leave
           the field empty to use the default channel note range.
@@ -189,6 +209,11 @@ export function ChannelConfigDialog(props: ChannelConfigDialogProps) {
       </form>
     </dialog>
   );
+}
+
+function normalizeChannelName(value: string): string | undefined {
+  const trimmed = value.trim();
+  return trimmed === '' ? undefined : trimmed;
 }
 
 interface NotesParseSuccess {
