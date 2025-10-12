@@ -3,7 +3,14 @@ import { ChannelConfigDialog } from './components/ChannelConfigDialog';
 import { ContextMenu, ContextMenuItem, createContextMenuController } from './components/ContextMenu';
 import styles from './FrameEditor.module.css';
 import { PatternEditor } from './PatternEditor';
-import { createDefaultChannelNotes, type Note, type Pattern, type PatternID, type Song } from './song';
+import {
+  type ChannelMode,
+  createDefaultChannelNotes,
+  type Note,
+  type Pattern,
+  type PatternID,
+  type Song,
+} from './song';
 import { range } from './utils/utils';
 
 interface ChannelDialogState {
@@ -33,9 +40,10 @@ export function FrameEditor(props: FrameEditorProps) {
   const channelContextMenu = createContextMenuController<{ channelIndex: number }>();
   const [channelDialogState, setChannelDialogState] = createSignal<ChannelDialogState | null>(null);
 
-  function handleSaveChannelNotes(channelIndex: number, notes: Note[] | undefined) {
+  function handleSaveChannelConfig(channelIndex: number, config: { notes: Note[] | undefined; mode: ChannelMode }) {
     const channel = props.channels[channelIndex];
-    channel.notes = notes;
+    channel.notes = config.notes;
+    channel.mode = config.mode;
   }
 
   return (
@@ -86,12 +94,6 @@ export function FrameEditor(props: FrameEditorProps) {
                     channel={channelIndex}
                     allowedNotes={props.channels[channelIndex]?.notes ?? fallbackNotes}
                     displayMode={props.channels[channelIndex]?.mode ?? 'pianoRoll'}
-                    onDisplayModeChange={(mode) => {
-                      const channel = props.channels[channelIndex];
-                      if (channel) {
-                        channel.mode = mode;
-                      }
-                    }}
                   />
                 )}
               </Show>
@@ -118,10 +120,11 @@ export function FrameEditor(props: FrameEditorProps) {
             open={true}
             channelName={`Channel ${state().channelIndex + 1}`}
             initialNotes={props.channels[state().channelIndex]?.notes}
+            initialMode={props.channels[state().channelIndex]?.mode}
             onCancel={() => setChannelDialogState(null)}
-            onSave={(notes) => {
+            onSave={(config) => {
+              handleSaveChannelConfig(state().channelIndex, config);
               setChannelDialogState(null);
-              handleSaveChannelNotes(state().channelIndex, notes);
             }}
           />
         )}

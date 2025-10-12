@@ -1,13 +1,14 @@
-import { Show, createEffect, createMemo, createSignal, onCleanup } from 'solid-js';
+import { createEffect, createMemo, createSignal, onCleanup, Show } from 'solid-js';
+import { type ChannelMode, createDefaultChannelNotes, type Note } from '../song';
 import styles from './ChannelConfigDialog.module.css';
-import { createDefaultChannelNotes, type Note } from '../song';
 
 export interface ChannelConfigDialogProps {
   open: boolean;
   channelName: string;
   initialNotes?: readonly Note[];
+  initialMode?: ChannelMode;
   onCancel: () => void;
-  onSave: (notes: Note[] | undefined) => void;
+  onSave: (config: ChannelConfigResult) => void;
 }
 
 const NOTE_NAME_MAPPINGS: readonly (readonly [number, readonly string[]])[] = [
@@ -30,15 +31,22 @@ const ENGLISH_NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A'
 const DEFAULT_CHANNEL_NOTES = createDefaultChannelNotes();
 const DEFAULT_NOTES_PREVIEW = formatNotesList(DEFAULT_CHANNEL_NOTES);
 const DEFAULT_NOTES_COUNT = DEFAULT_CHANNEL_NOTES.length;
+const DEFAULT_CHANNEL_MODE: ChannelMode = 'pianoRoll';
+
+interface ChannelConfigResult {
+  notes: Note[] | undefined;
+  mode: ChannelMode;
+}
 
 export function ChannelConfigDialog(props: ChannelConfigDialogProps) {
-  let dialogRef: HTMLDialogElement | undefined;
-  const [inputValue, setInputValue] = createSignal('');
+  let dialogRef: HTMLDialogElement;
+  const [notesInputValue, setNotesInputValue] = createSignal('');
   const [parseError, setParseError] = createSignal<string | null>(null);
   const [previewNotes, setPreviewNotes] = createSignal<Note[]>([]);
+  const [mode, setMode] = createSignal<ChannelMode>(DEFAULT_CHANNEL_MODE);
 
   const previewText = createMemo(() => {
-    if (inputValue().trim() === '') {
+    if (notesInputValue().trim() === '') {
       return `Default: ${DEFAULT_NOTES_PREVIEW}`;
     }
     const notes = previewNotes();
@@ -49,25 +57,21 @@ export function ChannelConfigDialog(props: ChannelConfigDialogProps) {
   });
 
   const previewCount = createMemo(() => {
-    if (inputValue().trim() === '') {
+    if (notesInputValue().trim() === '') {
       return DEFAULT_NOTES_COUNT;
     }
     return previewNotes().length;
   });
 
-  const handleDialogClose = () => {
+  function handleDialogClose() {
     props.onCancel();
-  };
+  }
 
   onCleanup(() => {
-    dialogRef?.removeEventListener('close', handleDialogClose);
+    dialogRef.removeEventListener('close', handleDialogClose);
   });
 
   createEffect(() => {
-    if (!dialogRef) {
-      return;
-    }
-
     if (props.open) {
       if (!dialogRef.open) {
         dialogRef.showModal();
@@ -82,8 +86,9 @@ export function ChannelConfigDialog(props: ChannelConfigDialogProps) {
       return;
     }
 
+    setMode(props.initialMode ?? DEFAULT_CHANNEL_MODE);
     const initialNotes = props.initialNotes ?? [];
-    setInputValue(initialNotes.length > 0 ? formatNotesList(initialNotes) : '');
+    setNotesInputValue(initialNotes.length > 0 ? formatNotesList(initialNotes) : '');
     setParseError(null);
     setPreviewNotes(initialNotes.slice());
   });
@@ -97,7 +102,7 @@ export function ChannelConfigDialog(props: ChannelConfigDialogProps) {
   }
 
   function handleInputValueChange(value: string) {
-    setInputValue(value);
+    setNotesInputValue(value);
 
     if (value.trim() === '') {
       setParseError(null);
@@ -118,23 +123,26 @@ export function ChannelConfigDialog(props: ChannelConfigDialogProps) {
 
   function handleSubmit(event: SubmitEvent) {
     event.preventDefault();
-    const trimmed = inputValue().trim();
+    const trimmedNotes = notesInputValue().trim();
 
-    if (trimmed === '') {
-      props.onSave(undefined);
-      dialogRef?.close();
+    if (trimmedNotes === '') {
+      props.onSave({ notes: undefined, mode: mode() });
+      dialogRef.close();
       return;
     }
 
-    const parseResult = parseNotesInput(trimmed);
+    const parseResult = parseNotesInput(trimmedNotes);
 
     if (!parseResult.ok) {
       setParseError(parseResult.error);
       return;
     }
 
-    props.onSave(parseResult.notes.length > 0 ? parseResult.notes : undefined);
-    dialogRef?.close();
+    props.onSave({
+      notes: parseResult.notes.length > 0 ? parseResult.notes : undefined,
+      mode: mode(),
+    });
+    dialogRef.close();
   }
 
   return (
@@ -144,13 +152,13 @@ export function ChannelConfigDialog(props: ChannelConfigDialogProps) {
           <h2>{props.channelName}</h2>
         </header>
         <p class={styles.channelDialogHint}>
-          Enter note names (for example `C3`, `C#3`, `Eb4`) or MIDI note numbers separated by spaces or commas. Leave the
-          field empty to use the default channel note range.
+          Enter note names (for example `C3`, `C#3`, `Eb4`) or MIDI note numbers separated by spaces or commas. Leave
+          the field empty to use the default channel note range.
         </p>
         <textarea
           class={styles.channelDialogTextarea}
           rows={4}
-          value={inputValue()}
+          value={notesInputValue()}
           onInput={(event) => handleInputValueChange(event.currentTarget.value)}
           placeholder="Example: C3, D3, E3, F3, G3, A3, B3"
         />
@@ -160,6 +168,17 @@ export function ChannelConfigDialog(props: ChannelConfigDialogProps) {
         <div class={styles.channelDialogPreview}>
           <span class={styles.channelDialogPreviewLabel}>Allowed notes ({previewCount()})</span>
           <span class={styles.channelDialogPreviewValue}>{previewText()}</span>
+        </div>
+        <div class={styles.channelDialogMode}>
+          <span class={styles.channelDialogModeLabel}>Display mode</span>
+          <select
+            class={styles.channelDialogModeSelect}
+            value={mode()}
+            onChange={(event) => setMode(event.currentTarget.value as ChannelMode)}
+          >
+            <option value="pianoRoll">Piano Roll</option>
+            <option value="tracker">Tracker</option>
+          </select>
         </div>
         <footer class={styles.channelDialogActions}>
           <button type="button" onClick={() => dialogRef?.close()}>

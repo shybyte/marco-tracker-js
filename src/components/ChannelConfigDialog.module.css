@@ -79,6 +79,32 @@
   color: #f5f5f5;
 }
 
+.channelDialogMode {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.channelDialogModeLabel {
+  font-weight: bold;
+  color: #d1d1d1;
+  font-size: 0.9rem;
+}
+
+.channelDialogModeSelect {
+  border-radius: 8px;
+  border: 1px solid #444;
+  background: #111;
+  color: #fff;
+  padding: 8px 12px;
+  font-size: 0.95rem;
+
+  &:focus-visible {
+    outline: 2px solid rgba(90, 150, 255, 0.6);
+    border-color: rgba(90, 150, 255, 0.9);
+  }
+}
+
 .channelDialogActions {
   display: flex;
   justify-content: flex-end;

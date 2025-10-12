@@ -51,7 +51,6 @@ interface PatternEditorProps {
   channel: MidiCannel;
   allowedNotes: readonly Note[];
   displayMode: ChannelMode;
-  onDisplayModeChange: (mode: ChannelMode) => void;
 }
 
 export function PatternEditor(props: PatternEditorProps) {
@@ -121,18 +120,6 @@ export function PatternEditor(props: PatternEditorProps) {
 
   return (
     <div ref={focusElement} class={cssClasses.patternEditor} tabIndex={0} onKeyDown={onKeyDown}>
-      <div class={cssClasses.noteDisplayToggle}>
-        <label>
-          Display
-          <select
-            value={noteDisplayMode()}
-            onChange={(event) => props.onDisplayModeChange(event.currentTarget.value as ChannelMode)}
-          >
-            <option value="pianoRoll">PianoRoll</option>
-            <option value="tracker">Tracker</option>
-          </select>
-        </label>
-      </div>
       <table>
         <tbody>
           <Index each={range(0, props.patternLength - 1)}>
